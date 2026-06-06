@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Nexa Cuba | Experiencia de Compras Definitiva</title>
+    <meta name="description" content="La experiencia de compra más innovadora para Cuba. Productos premium con envío ultrarrápido. Tecnología, moda, hogar.">
+    <meta name="theme-color" content="#000000">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { 'inter': ['Inter', 'sans-serif'] } } }
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000000;
+            color: #fff;
+            overflow-x: hidden;
+            line-height: 1.5;
+            font-synthesis: none;
+        }
+        
+        /* ===== CURSOR PREMIUM CON MIX-BLEND (SOLO PC) ===== */
+        @media (min-width: 1024px) {
+            .custom-cursor, .custom-cursor-dot { display: block; }
+            body { cursor: none; }
+        }
+        @media (max-width: 1023px) {
+            .custom-cursor, .custom-cursor-dot { display: none; }
+            body { cursor: auto; }
+        }
+        .custom-cursor {
+            width: 28px; height: 28px;
+            border: 2px solid rgba(59,130,246,0.95);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: all 0.12s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            mix-blend-mode: difference;
+            backdrop-filter: invert(1);
+            box-shadow: 0 0 12px rgba(59,130,246,0.6);
+            will-change: left, top;
+        }
+        .custom-cursor-dot {
+            width: 5px; height: 5px;
+            background: #3b82f6;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.05s linear;
+            will-change: left, top;
+        }
+        .custom-cursor.hover { 
+            transform: scale(2.3); 
+            background: rgba(59,130,246,0.25); 
+            border-color: #60a5fa; 
+            mix-blend-mode: normal; 
+            backdrop-filter: blur(4px);
+        }
+        
+        /* ===== DISTORSIÓN ESPACIAL (de beta 0.4) ===== */
+        .space-distortion {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(59,130,246,0.25), rgba(139,92,246,0.1), transparent 70%);
+            filter: blur(60px);
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s;
+            will-change: left, top;
+        }
+        
+        /* ===== GLASS PREMIUM ===== */
+        .glass-premium {
+            background: rgba(10, 10, 20, 0.55);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(59,130,246,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        /* ===== LIQUID NEON (3 colores, mejor que beta 0.4) ===== */
+        .liquid-neon {
+            background: linear-gradient(135deg, #3b82f6 0%, #a855f7 30%, #06b6d4 60%, #3b82f6 100%);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: liquidShift 4s ease infinite;
+            text-shadow: 0 0 20px rgba(59,130,246,0.5);
+        }
+        @keyframes liquidShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* ===== CARD 4D (mejor que card-3d) ===== */
+        .card-4d {
+            transform-style: preserve-3d;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            will-change: transform;
+        }
+        .card-4d:hover {
+            transform: translateY(-10px) rotateX(3deg) rotateY(-3deg);
+            box-shadow: 0 30px 50px -20px rgba(59,130,246,0.4);
+            border-color: rgba(59,130,246,0.5);
+        }
+        
+        /* ===== RGB BORDER (de beta 0.4) ===== */
+        .rgb-border {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .rgb-border::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 22px;
+            background: conic-gradient(from 0deg, #3b82f6, #8b5cf6, #06b6d4, #3b82f6, #8b5cf6, #06b6d4);
+            animation: rgbSpin 4s linear infinite;
+            z-index: -1;
+            opacity: 0.6;
+        }
+        .rgb-border::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            border-radius: 18px;
+            background: #0a0a0a;
+            z-index: -1;
+        }
+        @keyframes rgbSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* ===== BOTONES CON RIPPLE (de beta 0.3) ===== */
+        .btn-radial {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+        .btn-radial:active::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            transform: translate(-50%, -50%);
+            animation: ripple 0.5s ease-out;
+        }
+        @keyframes ripple {
+            to { width: 300px; height: 300px; opacity: 0; }
+        }
+        
+        /* ===== EFECTO HOLOGRÁFICO ===== */
+        .holographic {
+            position: relative;
+            overflow: hidden;
+        }
+        .holographic::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.12) 30%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.12) 70%, transparent 100%);
+            transform: translateX(-100%);
+            transition: transform 0.7s ease;
+            pointer-events: none;
+        }
+        .holographic:hover::after { transform: translateX(100%); }
+        
+        /* ===== GLITCH TEXT (de beta 0.3) ===== */
+        .glitch-text {
+            animation: glitch 3s infinite;
+        }
+        @keyframes glitch {
+            0%, 100% { text-shadow: -2px 0 #3b82f6, 2px 0 #a855f7; }
+            25% { text-shadow: 2px 0 #3b82f6, -2px 0 #a855f7; }
+            50% { text-shadow: -2px 0 #06b6d4, 2px 0 #3b82f6; }
+            75% { text-shadow: 2px 0 #06b6d4, -2px 0 #a855f7; }
+        }
+        
+        /* ===== TOAST MODERNO ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+        .toast {
+            background: rgba(10,10,10,0.95);
+            border: 1px solid rgba(59,130,246,0.4);
+            border-radius: 14px;
+            padding: 12px 20px;
+            color: #fff;
+            font-size: 14px;
+            backdrop-filter: blur(20px);
+            animation: toastIn 0.4s cubic-bezier(0.23,1,0.32,1) forwards;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            font-weight: 500;
+        }
+        @keyframes toastIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* ===== REVEAL TEXT ===== */
+        .reveal-text {
+            opacity: 0;
+            transform: translateY(35px);
+            transition: opacity 0.8s cubic-bezier(0.2,0.9,0.4,1.2), transform 0.8s cubic-bezier(0.2,0.9,0.4,1.2);
+        }
+        .reveal-text.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #3b82f6, #8b5cf6); border-radius: 10px; }
+        
+        /* ===== PARTÍCULAS EN PRODUCTOS ===== */
+        .product-particles {
+            position: absolute;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .card-4d:hover .product-particles { opacity: 1; }
+        .product-particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: productBurst 0.7s ease-out forwards;
+        }
+        @keyframes productBurst {
+            0% { transform: translate(0,0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+        
+        /* ===== HEXÁGONOS DE FONDO ===== */
+        .hex-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill='none' stroke='%233b82f6' stroke-width='1'/%3E%3C/svg%3E");
+            background-size: 60px 60px;
+            animation: hexMove 25s linear infinite;
+        }
+        @keyframes hexMove {
+            0% { transform: translate(0,0) rotate(0deg); }
+            100% { transform: translate(60px,60px) rotate(5deg); }
+        }
+        
+        /* ===== MÓVIL OPTIMIZACIONES ===== */
+        @media (max-width: 768px) {
+            .glass-premium { backdrop-filter: blur(12px); background: rgba(0,0,0,0.7); }
+            .card-4d:active { transform: scale(0.98); transition: 0.05s; }
+            button, a { touch-action: manipulation; }
+        }
+        
+        /* ===== THREE.JS CONTAINER ===== */
+        #three-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.12;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="custom-cursor"></div>
+    <div class="custom-cursor-dot"></div>
+    <div class="space-distortion" id="spaceDistortion"></div>
+    <div class="hex-bg"></div>
+    <div id="three-container"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <nav class="fixed top-0 w-full z-50 transition-all duration-400 glass-premium border-b border-white/10" id="navbar">
+        <div class="max-w-7xl mx-auto px-5 sm:px-8 py-4 flex justify-between items-center">
+            <a href="#inicio" class="text-2xl font-black tracking-tighter"><span class="liquid-neon">Nexa</span><span class="text-white">Cuba</span></a>
+            <div class="hidden md:flex items-center gap-1">
+                <a href="#inicio" class="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-all">Inicio</a>
+                <a href="#productos" class="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-all">Productos</a>
+                <a href="#categorias" class="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-all">Categorías</a>
+                <a href="#como-funciona" class="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-all">Cómo Funciona</a>
+            </div>
+            <div class="hidden md:block">
+                <a href="#productos" class="btn-radial inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold text-sm rounded-full transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] hover:scale-105">Explorar →</a>
+            </div>
+            <button id="mobileMenuBtn" class="md:hidden w-10 h-10 rounded-full glass-premium flex items-center justify-center text-white text-xl" aria-label="Menú">☰</button>
+        </div>
+        <div id="mobileMenu" class="hidden md:hidden glass-premium flex-col px-6 pb-6 gap-2 border-t border-white/10">
+            <a href="#inicio" class="block px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-all">Inicio</a>
+            <a href="#productos" class="block px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-all">Productos</a>
+            <a href="#categorias" class="block px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-all">Categorías</a>
+            <a href="#como-funciona" class="block px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-all">Cómo Funciona</a>
+            <hr class="border-white/10 my-2">
+            <a href="#productos" class="btn-radial block text-center mx-4 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold rounded-full">Ver Productos</a>
+        </div>
+    </nav>
+
+    <main>
+        <!-- HERO SECTION -->
+        <section id="inicio" class="relative min-h-screen flex items-center overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-950 to-black"></div>
+            <div class="absolute top-1/4 left-10 w-[30rem] h-[30rem] bg-blue-600/20 rounded-full blur-[150px] animate-pulse"></div>
+            <div class="absolute bottom-1/3 right-10 w-[25rem] h-[25rem] bg-purple-600/15 rounded-full blur-[120px] animate-pulse" style="animation-delay:2s"></div>
+            <div class="absolute top-1/3 right-1/4 w-[20rem] h-[20rem] bg-cyan-500/10 rounded-full blur-[100px] animate-pulse" style="animation-delay:4s"></div>
+            
+            <div class="relative max-w-7xl mx-auto px-5 sm:px-8 py-28 md:py-36 z-10 w-full">
+                <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                    <div>
+                        <div class="reveal-text">
+                            <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium mb-8 backdrop-blur-sm">
+                                <span class="relative flex h-2.5 w-2.5">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500"></span>
+                                </span>
+                                🇨🇺 Envíos activos a toda Cuba 2026
+                            </span>
+                        </div>
+                        <h1 class="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight mb-6">
+                            <span class="block text-white reveal-text">Productos</span>
+                            <span class="block liquid-neon text-6xl sm:text-7xl lg:text-8xl xl:text-9xl mt-2 reveal-text glitch-text">Premium</span>
+                            <span class="block text-white text-2xl sm:text-3xl lg:text-4xl font-light mt-4 reveal-text">Directo a tu puerta</span>
+                        </h1>
+                        <p class="text-lg sm:text-xl text-gray-300 mb-10 max-w-xl leading-relaxed reveal-text">
+                            Curamos los mejores productos internacionales.
+                            <span class="text-white font-medium">Tecnología, moda, hogar</span> — experiencia revolucionaria.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4 reveal-text">
+                            <a href="#productos" class="btn-radial inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold text-lg rounded-full hover:shadow-[0_0_40px_rgba(59,130,246,0.6)] hover:scale-105 transition-all duration-300">Ver Catálogo →</a>
+                            <a href="#como-funciona" class="inline-flex items-center justify-center gap-2 px-8 py-4 border border-white/20 text-white font-semibold text-lg rounded-full hover:bg-white/10 hover:border-white/30 transition-all backdrop-blur-sm">Cómo Comprar</a>
+                        </div>
+                        <div class="flex flex-wrap gap-8 mt-12 pt-8 border-t border-white/5 reveal-text">
+                            <div><div class="text-2xl sm:text-3xl font-bold"><span class="counter-value" data-target="420">0</span><span class="text-blue-400">+</span></div><div class="text-sm text-gray-400 mt-1">Productos Verificados</div></div>
+                            <div><div class="text-2xl sm:text-3xl font-bold"><span class="counter-value" data-target="16">0</span></div><div class="text-sm text-gray-400 mt-1">Provincias Cubiertas</div></div>
+                            <div><div class="text-2xl sm:text-3xl font-bold liquid-neon">24/7</div><div class="text-sm text-gray-400 mt-1">Soporte Dedicado</div></div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-6 gap-3 reveal-text">
+                        <div class="col-span-4 row-span-2 rounded-2xl overflow-hidden glass-premium holographic"><img src="https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=600&h=500&fit=crop&auto=format&q=80" alt="Laptop premium" class="w-full h-full object-cover" loading="eager"></div>
+                        <div class="col-span-2 rounded-2xl overflow-hidden glass-premium holographic"><img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=250&fit=crop&auto=format&q=80" alt="Smartwatch" loading="lazy"></div>
+                        <div class="col-span-3 rounded-2xl overflow-hidden glass-premium holographic"><img src="https://images.unsplash.com/photo-1560343090-f0409e92791a?w=350&h=250&fit=crop&auto=format&q=80" alt="Calzado" loading="lazy"></div>
+                        <div class="col-span-3 rounded-2xl overflow-hidden glass-premium holographic"><img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=350&h=250&fit=crop&auto=format&q=80" alt="Zapatillas" loading="lazy"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRODUCTOS SECTION -->
+        <section id="productos" class="py-24 px-5 bg-black relative z-10">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <span class="liquid-neon font-semibold text-xs sm:text-sm uppercase tracking-[.2em]">Catálogo Premium</span>
+                    <h2 class="text-4xl sm:text-5xl lg:text-6xl font-black mt-4 mb-6 reveal-text">Productos <span class="liquid-neon">Destacados</span></h2>
+                    <p class="text-gray-400 text-lg max-w-2xl mx-auto reveal-text">Calidad verificada. Experiencia única.</p>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6" id="productsGrid"></div>
+                <div class="text-center mt-12 reveal-text">
+                    <button id="loadMoreBtn" class="px-8 py-3.5 rounded-full border border-white/20 text-white font-medium hover:bg-white/10 hover:border-white/30 transition-all backdrop-blur-sm inline-flex items-center gap-2">Ver Más Productos <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- CATEGORÍAS -->
+        <section id="categorias" class="py-24 px-5 bg-gradient-to-b from-black via-gray-950 to-black relative z-10">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <span class="liquid-neon font-semibold text-xs sm:text-sm uppercase tracking-[.2em]">Navega por</span>
+                    <h2 class="text-4xl sm:text-5xl lg:text-6xl font-black mt-4 mb-6 reveal-text">Categorías <span class="liquid-neon">Top</span></h2>
+                    <p class="text-gray-400 text-lg max-w-2xl mx-auto reveal-text">Encuentra lo que necesitas</p>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                    <a href="#" class="glass-premium rounded-2xl p-6 text-center card-4d cursor-pointer transition-all"><span class="text-5xl block mb-3">📱</span><span class="text-sm font-semibold text-white">Tecnología</span></a>
+                    <a href="#" class="glass-premium rounded-2xl p-6 text-center card-4d cursor-pointer transition-all"><span class="text-5xl block mb-3">👕</span><span class="text-sm font-semibold text-white">Moda</span></a>
+                    <a href="#" class="glass-premium rounded-2xl p-6 text-center card-4d cursor-pointer transition-all"><span class="text-5xl block mb-3">🍎</span><span class="text-sm font-semibold text-white">Alimentos</span></a>
+                    <a href="#" class="glass-premium rounded-2xl p-6 text-center card-4d cursor-pointer transition-all"><span class="text-5xl block mb-3">🏠</span><span class="text-sm font-semibold text-white">Hogar</span></a>
+                    <a href="#" class="glass-premium rounded-2xl p-6 text-center card-4d cursor-pointer transition-all"><span class="text-5xl block mb-3">⚽</span><span class="text-sm font-semibold text-white">Deportes</span></a>
+                    <a href="#" class="glass-premium rounded-2xl p-6 text-center card-4d cursor-pointer transition-all"><span class="text-5xl block mb-3">✨</span><span class="text-sm font-semibold text-white">Más</span></a>
+                </div>
+            </div>
+        </section>
+
+        <!-- CÓMO FUNCIONA -->
+        <section id="como-funciona" class="py-24 px-5 bg-black relative overflow-hidden z-10">
+            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.08),transparent_70%)]"></div>
+            <div class="relative max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <span class="liquid-neon font-semibold text-xs sm:text-sm uppercase tracking-[.2em]">Proceso Simple</span>
+                    <h2 class="text-4xl sm:text-5xl lg:text-6xl font-black mt-4 mb-6 reveal-text">¿Cómo <span class="liquid-neon">Comprar?</span></h2>
+                    <p class="text-gray-400 text-lg max-w-2xl mx-auto reveal-text">Tres pasos para recibir tus productos en Cuba</p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8 lg:gap-12">
+                    <div class="glass-premium rounded-2xl p-8 text-center card-4d reveal-text"><div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-3xl font-black text-white shadow-lg shadow-blue-500/20">1</div><h3 class="text-xl font-bold mb-3 liquid-neon">Elige tu Producto</h3><p class="text-gray-400">Catálogo curado con productos internacionales verificados.</p></div>
+                    <div class="glass-premium rounded-2xl p-8 text-center card-4d reveal-text"><div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-3xl font-black text-white shadow-lg shadow-blue-500/20">2</div><h3 class="text-xl font-bold mb-3 liquid-neon">Clic en Comprar</h3><p class="text-gray-400">Conexión con proveedores verificados para compra segura.</p></div>
+                    <div class="glass-premium rounded-2xl p-8 text-center card-4d reveal-text"><div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-3xl font-black text-white shadow-lg shadow-blue-500/20">3</div><h3 class="text-xl font-bold mb-3 liquid-neon">Recibe en Cuba</h3><p class="text-gray-400">Entrega directa en cualquier provincia de la isla.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="border-t border-white/10 py-16 px-5 bg-black relative z-10 text-center text-gray-500 text-sm">© 2026 Nexa Cuba — Experiencia premium de compras con envío a Cuba.</footer>
+    </main>
+
+    <script>
+    (function(){
+        // ========== PRODUCTOS DINÁMICOS ==========
+        let currentProducts = [
+            { name: "Smartphone 5G Pro", price: "$299 USD", img: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400&h=300&fit=crop", desc: "6.7\" AMOLED, 128GB" },
+            { name: "Auriculares ANC Pro", price: "$89 USD", img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop", desc: "Cancelación Ruido, 30h" },
+            { name: "Nike Air Max 2026", price: "$129 USD", img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop", desc: "Originales, Tallas 6-12" },
+            { name: "Smartwatch Ultra", price: "$149 USD", img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=300&fit=crop", desc: "GPS, Monitor Cardíaco" }
+        ];
+        
+        const extraProducts = [
+            { name: "iPad Pro M2", price: "$799 USD", img: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400&h=300&fit=crop", desc: "11\" Liquid Retina" },
+            { name: "Cámara Sony ZV-E10", price: "$699 USD", img: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&h=300&fit=crop", desc: "4K, Vlog perfecto" },
+            { name: "Monitor LG UltraGear", price: "$399 USD", img: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=400&h=300&fit=crop", desc: "144Hz, 1ms, G-Sync" },
+            { name: "Teclado Mecánico RGB", price: "$89 USD", img: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&h=300&fit=crop", desc: "Switch Red, Programable" }
+        ];
+        
+        let productsLoaded = false;
+        
+        function renderProducts(products){
+            const grid = document.getElementById('productsGrid');
+            if(!grid) return;
+            grid.innerHTML = products.map(p => `
+                <div class="rgb-border card-4d cursor-pointer">
+                    <div class="glass-premium rounded-2xl overflow-hidden h-full">
+                        <div class="relative holographic"><div class="product-particles"></div><img src="${p.img}" class="w-full h-56 object-cover" alt="${p.name}" loading="lazy"></div>
+                        <div class="p-5"><h3 class="text-lg font-bold text-white mb-1">${p.name}</h3><p class="text-gray-400 text-sm mb-4">${p.desc}</p><div class="flex items-center justify-between"><span class="text-2xl font-bold liquid-neon">${p.price}</span><a href="#" class="buy-btn btn-radial inline-flex items-center gap-1.5 bg-gradient-to-r from-blue-600 to-blue-500 text-white px-4 py-2.5 rounded-full text-sm font-semibold hover:scale-105 transition-transform">Comprar →</a></div></div>
+                    </div>
+                </div>
+            `).join('');
+            attachBuyEvents();
+            attachParticleEffects();
+        }
+        
+        function attachBuyEvents(){
+            document.querySelectorAll('.buy-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showToast('✨ Producto seleccionado', 'Te contactaremos para coordinar el envío a Cuba.');
+                });
+            });
+        }
+        
+        function showToast(title, msg){
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<span class="font-semibold">${title}</span><span style="color:#94a3b8;font-size:12px">${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        function attachParticleEffects(){
+            document.querySelectorAll('.rgb-border').forEach(card => {
+                const particlesContainer = card.querySelector('.product-particles');
+                if(!particlesContainer) return;
+                card.addEventListener('mouseenter', () => {
+                    particlesContainer.innerHTML = '';
+                    for(let i=0;i<12;i++){
+                        const p = document.createElement('div');
+                        p.classList.add('product-particle');
+                        const angle = (Math.PI*2*i)/12;
+                        const distance = 40 + Math.random()*50;
+                        const tx = Math.cos(angle)*distance;
+                        const ty = Math.sin(angle)*distance;
+                        p.style.setProperty('--tx', tx+'px');
+                        p.style.setProperty('--ty', ty+'px');
+                        p.style.left = '50%';
+                        p.style.top = '50%';
+                        p.style.background = `hsl(${200+Math.random()*60},80%,60%)`;
+                        p.style.animationDelay = Math.random()*0.2+'s';
+                        particlesContainer.appendChild(p);
+                    }
+                });
+                card.addEventListener('mouseleave', () => setTimeout(() => particlesContainer.innerHTML = '', 300));
+            });
+        }
+        
+        renderProducts(currentProducts);
+        
+        document.getElementById('loadMoreBtn')?.addEventListener('click', () => {
+            if(!productsLoaded){
+                const allProducts = [...currentProducts, ...extraProducts];
+                renderProducts(allProducts);
+                productsLoaded = true;
+                showToast('🚀 Catálogo expandido', 'Nuevos productos añadidos a la colección.');
+            } else {
+                showToast('✨ Catálogo completo', 'Ya estás viendo todos los productos disponibles.');
+            }
+        });
+        
+        // ========== CURSOR PREMIUM ==========
+        const isDesktop = window.innerWidth >= 1024;
+        if(isDesktop){
+            const cursor = document.querySelector('.custom-cursor');
+            const dot = document.querySelector('.custom-cursor-dot');
+            let mx = 0, my = 0, dx = 0, dy = 0;
+            document.addEventListener('mousemove', (e) => {
+                mx = e.clientX; my = e.clientY;
+                if(cursor) { cursor.style.left = mx - 14 + 'px'; cursor.style.top = my - 14 + 'px'; }
+            });
+            function animateDot(){
+                dx += (mx - dx) * 0.28;
+                dy += (my - dy) * 0.28;
+                if(dot) { dot.style.left = dx - 2.5 + 'px'; dot.style.top = dy - 2.5 + 'px'; }
+                requestAnimationFrame(animateDot);
+            }
+            animateDot();
+            document.querySelectorAll('a, button, .card-4d, .rgb-border, .cat-item').forEach(el => {
+                el.addEventListener('mouseenter', () => cursor?.classList.add('hover'));
+                el.addEventListener('mouseleave', () => cursor?.classList.remove('hover'));
+            });
+        }
+        
+        // ========== DISTORSIÓN ESPACIAL ==========
+        const distortion = document.getElementById('spaceDistortion');
+        const hero = document.getElementById('inicio');
+        if(distortion && hero){
+            document.addEventListener('mousemove', (e) => {
+                const rect = hero.getBoundingClientRect();
+                if(rect.top < window.innerHeight && rect.bottom > 0){
+                    distortion.style.left = e.clientX + 'px';
+                    distortion.style.top = e.clientY + 'px';
+                    distortion.style.opacity = '1';
+                } else distortion.style.opacity = '0';
+            });
+        }
+        
+        // ========== THREE.JS ==========
+        if(typeof THREE !== 'undefined'){
+            const container = document.getElementById('three-container');
+            if(container){
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ alpha: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+                container.appendChild(renderer.domElement);
+                const sphereGeo = new THREE.IcosahedronGeometry(1.2, 0);
+                const sphereMat = new THREE.MeshBasicMaterial({ color: 0x3b82f6, wireframe: true, transparent: true, opacity: 0.25 });
+                const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+                scene.add(sphere);
+                const particlesGeo = new THREE.BufferGeometry();
+                const particlesCount = 150;
+                const posArray = new Float32Array(particlesCount * 3);
+                for(let i=0;i<particlesCount*3;i++) posArray[i] = (Math.random() - 0.5) * 18;
+                particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+                const particlesMat = new THREE.PointsMaterial({ size: 0.03, color: 0x60a5fa, transparent: true, opacity: 0.4 });
+                const particlesMesh = new THREE.Points(particlesGeo, particlesMat);
+                scene.add(particlesMesh);
+                camera.position.z = 6;
+                function animate3D(){
+                    requestAnimationFrame(animate3D);
+                    sphere.rotation.x += 0.002;
+                    sphere.rotation.y += 0.003;
+                    particlesMesh.rotation.y -= 0.0005;
+                    renderer.render(scene, camera);
+                }
+                animate3D();
+                window.addEventListener('resize', () => {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            }
+        }
+        
+        // ========== REVEAL TEXT & COUNTERS ==========
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting){
+                    entry.target.classList.add('visible');
+                    if(entry.target.classList.contains('counter-value')){
+                        const target = parseInt(entry.target.getAttribute('data-target'));
+                        let current = 0;
+                        const duration = 1400;
+                        const start = performance.now();
+                        function update(time){
+                            const elapsed = time - start;
+                            const progress = Math.min(elapsed / duration, 1);
+                            const eased = 1 - Math.pow(1 - progress, 3);
+                            current = Math.floor(eased * target);
+                            entry.target.textContent = current;
+                            if(progress < 1) requestAnimationFrame(update);
+                        }
+                        requestAnimationFrame(update);
+                        observer.unobserve(entry.target);
+                    } else observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.2 });
+        document.querySelectorAll('.reveal-text, .counter-value').forEach(el => observer.observe(el));
+        
+        // ========== NAVBAR SCROLL ==========
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if(window.scrollY > 50) navbar.classList.add('bg-black/80', 'backdrop-blur-xl');
+            else navbar.classList.remove('bg-black/80', 'backdrop-blur-xl');
+        });
+        
+        // ========== MOBILE MENU ==========
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        if(mobileBtn && mobileMenu){
+            mobileBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+            mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => mobileMenu.classList.add('hidden')));
+        }
+        
+        // ========== SMOOTH SCROLL ==========
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e){
+                const hash = this.getAttribute('href');
+                if(hash === '#') return;
+                const target = document.querySelector(hash);
+                if(target){
+                    e.preventDefault();
+                    const offset = 80;
+                    const top = target.getBoundingClientRect().top + window.scrollY - offset;
+                    window.scrollTo({ top, behavior: 'smooth' });
+                    history.pushState(null, null, hash);
+                }
+            });
+        });
+        
+        // ========== GLITCH INTERMITENTE EN HERO ==========
+        const glitchElement = document.querySelector('.glitch-text');
+        if(glitchElement){
+            setInterval(() => {
+                glitchElement.style.animation = 'none';
+                setTimeout(() => glitchElement.style.animation = 'glitch 3s infinite', 50);
+            }, 5000);
+        }
+        
+        console.log('🚀 NEXA CUBA — Fusión definitiva (beta 0.3 + RGB border + Space distortion). Sin logros.');
+    })();
+    </script>
+</body>
+</html>
