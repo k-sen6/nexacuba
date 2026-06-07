@@ -4,7 +4,7 @@ import { Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
-import { Store, Mail, Lock } from "lucide-react"
+import { Store, Mail, Lock, AlertTriangle, MailQuestion } from "lucide-react"
 
 function LoginForm() {
   const router = useRouter()
@@ -12,6 +12,7 @@ function LoginForm() {
   const registrado = searchParams.get("registrado")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [needsConfirmation, setNeedsConfirmation] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
@@ -19,12 +20,17 @@ function LoginForm() {
     e.preventDefault()
     setLoading(true)
     setError("")
+    setNeedsConfirmation(false)
     const supabase = createClient()
 
     const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
 
     if (authError) {
-      setError(authError.message)
+      if (authError.message.includes("Email not confirmed") || authError.message.includes("email_not_confirmed")) {
+        setNeedsConfirmation(true)
+      } else {
+        setError(authError.message)
+      }
       setLoading(false)
       return
     }
@@ -60,8 +66,23 @@ function LoginForm() {
         </div>
 
         {registrado && (
-          <div className="mb-6 p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm text-center">
-            Cuenta creada exitosamente. Ahora inicia sesión.
+          <div className="mb-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm text-center">
+            <MailQuestion className="w-5 h-5 inline-block mr-2" />
+            Te enviamos un correo de confirmación. Revisa tu bandeja de entrada (y SPAM) y haz clic en el enlace para activar tu cuenta.
+          </div>
+        )}
+
+        {needsConfirmation && (
+          <div className="mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+            <div className="flex items-center gap-2 text-amber-400 font-semibold mb-2">
+              <AlertTriangle className="w-5 h-5" />
+              Correo no confirmado
+            </div>
+            <p className="text-gray-300 text-sm leading-relaxed">
+              Revisa tu bandeja de entrada (y SPAM) y haz clic en el enlace de confirmación que te enviamos.
+              Si el enlace te lleva a localhost, ve a Supabase Dashboard → Authentication → Settings
+              y cambia "Site URL" a: <code className="text-blue-300 block mt-1 text-xs break-all">https://k-sen6.github.io/nexacuba</code>
+            </p>
           </div>
         )}
 

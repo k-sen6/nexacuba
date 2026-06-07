@@ -4,7 +4,7 @@ import { Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
-import { Store, Mail, Lock, User, Phone, Building2, MapPin } from "lucide-react"
+import { Store, Mail, Lock, User, Phone, Building2, MapPin, CheckCircle, ArrowRight } from "lucide-react"
 
 function RegisterForm() {
   const router = useRouter()
@@ -13,6 +13,8 @@ function RegisterForm() {
   const [rol, setRol] = useState<"cliente" | "mayorista">(rolParam as "cliente" | "mayorista")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [success, setSuccess] = useState(false)
+  const [registeredEmail, setRegisteredEmail] = useState("")
   const [form, setForm] = useState({
     email: "", password: "", nombre: "", telefono: "",
     nombre_negocio: "", provincia: "", whatsapp: "",
@@ -45,13 +47,51 @@ function RegisterForm() {
       return
     }
 
-    if (data.user) {
-      router.push("/auth/login?registrado=1")
-    }
+    setRegisteredEmail(form.email)
+    setSuccess(true)
     setLoading(false)
   }
 
   const update = (field: string, value: string) => setForm((f) => ({ ...f, [field]: value }))
+
+  if (success) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-5 pt-24 pb-12 bg-black">
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-950 to-black" />
+        <div className="relative w-full max-w-md text-center">
+          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
+          <h1 className="text-3xl font-bold text-white mb-3">Cuenta Creada</h1>
+          <p className="text-gray-300 mb-2">
+            Hemos enviado un correo de confirmación a:
+          </p>
+          <p className="text-blue-400 font-medium text-lg mb-6">{registeredEmail}</p>
+
+          <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-left mb-6">
+            <p className="text-amber-400 font-semibold mb-2">⚠️ Revisa tu correo</p>
+            <p className="text-gray-300 text-sm leading-relaxed">
+              Abre el correo que te enviamos y haz clic en el enlace de confirmación.
+              Si no lo ves, revisa la carpeta de <strong>SPAM</strong>.
+            </p>
+          </div>
+
+          <div className="p-5 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-left mb-6">
+            <p className="text-blue-400 font-semibold mb-2">🔗 ¿El enlace te lleva a localhost?</p>
+            <p className="text-gray-300 text-sm leading-relaxed">
+              Es normal. En Supabase ve a <strong>Authentication → Settings</strong> y cambia
+              "Site URL" a: <code className="text-blue-300 block mt-1 break-all">https://k-sen6.github.io/nexacuba</code>
+            </p>
+          </div>
+
+          <Link
+            href="/auth/login"
+            className="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold rounded-xl hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] transition-all"
+          >
+            Ir a Iniciar Sesión <ArrowRight className="w-5 h-5" />
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-5 pt-24 pb-12 bg-black">
@@ -67,7 +107,6 @@ function RegisterForm() {
           <p className="text-gray-400 mt-2">Únete al marketplace B2B de Cuba</p>
         </div>
 
-        {/* Rol selector */}
         <div className="flex gap-2 mb-6 p-1 rounded-xl bg-white/5 border border-white/10">
           {(["cliente", "mayorista"] as const).map((r) => (
             <button
