@@ -4,7 +4,7 @@ import { Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
-import { Store, Mail, Lock, User, Phone, Building2, MapPin, CheckCircle, ArrowRight } from "lucide-react"
+import { Store, Mail, Lock, User, Phone, Building2, MapPin, CheckCircle, ArrowRight, ShoppingCart } from "lucide-react"
 
 function RegisterForm() {
   const router = useRouter()
@@ -61,26 +61,10 @@ function RegisterForm() {
         <div className="relative w-full max-w-md text-center">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
           <h1 className="text-3xl font-bold text-white mb-3">Cuenta Creada</h1>
-          <p className="text-gray-300 mb-2">
-            Hemos enviado un correo de confirmación a:
+          <p className="text-gray-300 mb-6">
+            Tu cuenta <strong className="text-white">{registeredEmail}</strong> ha sido creada exitosamente.
+            Ya puedes iniciar sesión.
           </p>
-          <p className="text-blue-400 font-medium text-lg mb-6">{registeredEmail}</p>
-
-          <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-left mb-6">
-            <p className="text-amber-400 font-semibold mb-2">⚠️ Revisa tu correo</p>
-            <p className="text-gray-300 text-sm leading-relaxed">
-              Abre el correo que te enviamos y haz clic en el enlace de confirmación.
-              Si no lo ves, revisa la carpeta de <strong>SPAM</strong>.
-            </p>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-left mb-6">
-            <p className="text-blue-400 font-semibold mb-2">🔗 ¿El enlace te lleva a localhost?</p>
-            <p className="text-gray-300 text-sm leading-relaxed">
-              Es normal. En Supabase ve a <strong>Authentication → Settings</strong> y cambia
-              "Site URL" a: <code className="text-blue-300 block mt-1 break-all">https://k-sen6.github.io/nexacuba</code>
-            </p>
-          </div>
 
           <Link
             href="/auth/login"
@@ -112,11 +96,11 @@ function RegisterForm() {
             <button
               key={r}
               onClick={() => { setRol(r); setError("") }}
-              className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+              className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all inline-flex items-center justify-center gap-1.5 ${
                 rol === r ? "bg-blue-600 text-white shadow-lg" : "text-gray-400 hover:text-white"
               }`}
             >
-              {r === "cliente" ? "🛒 Cliente" : "🏪 Mayorista"}
+              {r === "cliente" ? <><ShoppingCart className="w-4 h-4" /> Cliente</> : <><Store className="w-4 h-4" /> Mayorista</>}
             </button>
           ))}
         </div>

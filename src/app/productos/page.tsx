@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Search, MapPin, Filter, ArrowRight } from "lucide-react"
+import { Search, MapPin, Filter, ArrowRight, SearchX } from "lucide-react"
 
 const allProducts = [
   { id: "1", name: "Smartphone 5G Pro", price: 299, img: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400&h=300&fit=crop", desc: '6.7" AMOLED, 128GB', mayorista: "TechCuba Store", provincia: "La Habana", whatsapp: "+5355555555" },
@@ -100,7 +100,7 @@ export default function ProductosPage() {
 
         {filtered.length === 0 && (
           <div className="text-center py-20 text-gray-500">
-            <p className="text-2xl mb-2">😕</p>
+            <SearchX className="w-12 h-12 text-gray-600 mx-auto mb-3" />
             <p>No se encontraron productos con esos filtros.</p>
           </div>
         )}

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { Plus, Trash2, Edit3, Loader2, Package } from "lucide-react"
+import { Plus, Trash2, Edit3, Loader2, Package, Star } from "lucide-react"
 import { Modal } from "@/components/ui/Modal"
 import { ProductForm } from "@/components/products/ProductForm"
 
@@ -125,7 +125,7 @@ export default function MayoristaProductos() {
                       <td className="p-4 text-gray-400">{p.stock ?? "∞"}</td>
                       <td className="p-4">
                         {p.destacado ? (
-                          <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">★ Destacado</span>
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20"><Star className="w-3 h-3 fill-amber-400" /> Destacado</span>
                         ) : (
                           <span className="text-gray-500">—</span>
                         )}

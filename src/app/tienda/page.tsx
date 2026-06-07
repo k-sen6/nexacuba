@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
-import { Store, MapPin, Phone, Shield, ArrowRight, Loader2 } from "lucide-react"
+import { Store, MapPin, Phone, Shield, ArrowRight, Loader2, Star } from "lucide-react"
 
 function StoreContent() {
   const searchParams = useSearchParams()
@@ -108,7 +108,7 @@ function StoreContent() {
                   <div className="p-5">
                     <div className="flex items-center justify-between mb-2">
                       {p.categorias && <span className="text-xs text-blue-400 font-medium">{p.categorias.nombre}</span>}
-                      {p.destacado && <span className="text-xs text-amber-400">★ Destacado</span>}
+                      {p.destacado && <span className="inline-flex items-center gap-1 text-xs text-amber-400"><Star className="w-3 h-3 fill-amber-400" /> Destacado</span>}
                     </div>
                     <h3 className="text-lg font-bold text-white mb-1">{p.nombre}</h3>
                     {p.descripcion && <p className="text-gray-400 text-sm mb-4 line-clamp-2">{p.descripcion}</p>}

@@ -1,12 +1,13 @@
 import Link from "next/link"
+import { Smartphone, Shirt, ShoppingBag, Home, Trophy, Sparkles } from "lucide-react"
 
 const categories = [
-  { icon: "📱", name: "Tecnología", slug: "tecnologia" },
-  { icon: "👕", name: "Moda", slug: "moda" },
-  { icon: "🍎", name: "Alimentos", slug: "alimentos" },
-  { icon: "🏠", name: "Hogar", slug: "hogar" },
-  { icon: "⚽", name: "Deportes", slug: "deportes" },
-  { icon: "✨", name: "Más", slug: "mas" },
+  { icon: Smartphone, name: "Tecnología", slug: "tecnologia" },
+  { icon: Shirt, name: "Moda", slug: "moda" },
+  { icon: ShoppingBag, name: "Alimentos", slug: "alimentos" },
+  { icon: Home, name: "Hogar", slug: "hogar" },
+  { icon: Trophy, name: "Deportes", slug: "deportes" },
+  { icon: Sparkles, name: "Más", slug: "mas" },
 ]
 
 export function CategoriesSection() {
@@ -29,7 +30,7 @@ export function CategoriesSection() {
               href={`/productos?categoria=${cat.slug}`}
               className="rounded-2xl p-6 text-center border border-white/10 bg-white/[0.03] backdrop-blur-sm hover:bg-white/[0.06] hover:border-blue-500/30 hover:-translate-y-1 transition-all"
             >
-              <span className="text-5xl block mb-3">{cat.icon}</span>
+              <cat.icon className="w-10 h-10 text-blue-500 mx-auto mb-3" />
               <span className="text-sm font-semibold text-white">{cat.name}</span>
             </Link>
           ))}
