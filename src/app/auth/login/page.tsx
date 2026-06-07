@@ -21,7 +21,7 @@ function LoginForm() {
     setError("")
     const supabase = createClient()
 
-    const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
 
     if (authError) {
       setError(authError.message)
@@ -29,7 +29,19 @@ function LoginForm() {
       return
     }
 
-    router.push("/")
+    const { data: perfil } = await supabase
+      .from("perfiles")
+      .select("rol")
+      .eq("id", data.user.id)
+      .single()
+
+    if (perfil?.rol === "mayorista") {
+      router.push("/mayorista/dashboard")
+    } else if (perfil?.rol === "admin") {
+      router.push("/admin")
+    } else {
+      router.push("/productos")
+    }
     router.refresh()
   }
 
