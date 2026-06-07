@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
-import { Package, BarChart3, Settings, TrendingUp, ShoppingBag, Eye, MousePointerClick, Store, LogOut, Loader2 } from "lucide-react"
+import { Package, BarChart3, Settings, TrendingUp, ShoppingBag, Eye, MousePointerClick, LogOut, Loader2 } from "lucide-react"
 
 export default function MayoristaDashboard() {
   const router = useRouter()

@@ -1,13 +1,12 @@
 "use client"
 
 import { Suspense, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { Store, Mail, Lock, User, Phone, Building2, MapPin, CheckCircle, ArrowRight, ShoppingCart } from "lucide-react"
 
 function RegisterForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const rolParam = searchParams.get("rol") || "cliente"
   const [rol, setRol] = useState<"cliente" | "mayorista">(rolParam as "cliente" | "mayorista")
@@ -26,7 +25,7 @@ function RegisterForm() {
     setError("")
     const supabase = createClient()
 
-    const { data, error: authError } = await supabase.auth.signUp({
+    const { error: authError } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
       options: {

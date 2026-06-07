@@ -81,7 +81,7 @@ function LoginForm() {
             <p className="text-gray-300 text-sm leading-relaxed">
               Revisa tu bandeja de entrada (y SPAM) y haz clic en el enlace de confirmación que te enviamos.
               Si el enlace te lleva a localhost, ve a Supabase Dashboard → Authentication → Settings
-              y cambia "Site URL" a: <code className="text-blue-300 block mt-1 text-xs break-all">https://k-sen6.github.io/nexacuba</code>
+              y cambia <strong>Site URL</strong> a: <code className="text-blue-300 block mt-1 text-xs break-all">https://k-sen6.github.io/nexacuba</code>
             </p>
           </div>
         )}
