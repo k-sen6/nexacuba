@@ -42,12 +42,12 @@ export function HeroSection() {
               <Flag className="w-4 h-4 text-blue-400" /> El marketplace B2B de Cuba
             </div>
 
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight mb-6">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight mb-6">
               <span className="block text-white">Conectamos</span>
-              <span className="block bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 bg-[length:300%_300%] animate-liquid bg-clip-text text-transparent text-6xl sm:text-7xl lg:text-8xl xl:text-9xl mt-2">
+              <span className="block bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 bg-[length:300%_300%] animate-liquid bg-clip-text text-transparent text-5xl sm:text-6xl lg:text-7xl xl:text-8xl mt-2">
                 Mayoristas
               </span>
-              <span className="block text-white text-2xl sm:text-3xl lg:text-4xl font-light mt-4">
+              <span className="block text-white text-xl sm:text-2xl lg:text-3xl font-light mt-4">
                 con Clientes en toda Cuba
               </span>
             </h1>
