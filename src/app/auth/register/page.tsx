@@ -1,12 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { Store, Mail, Lock, User, Phone, Building2, MapPin } from "lucide-react"
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const rolParam = searchParams.get("rol") || "cliente"
@@ -161,5 +161,13 @@ export default function RegisterPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-black"><div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full" /></div>}>
+      <RegisterForm />
+    </Suspense>
   )
 }
