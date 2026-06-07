@@ -1,11 +1,31 @@
 "use client"
 
-import { TrendingUp, Eye, MousePointerClick, ShoppingBag } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
+import { TrendingUp, Eye, MousePointerClick, ShoppingBag, Loader2 } from "lucide-react"
 
 export default function MayoristaAnalytics() {
+  const router = useRouter()
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) { router.push("/auth/login"); return }
+      setLoading(false)
+    })
+  }, [router])
+
   const days = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
   const data = [30, 45, 38, 52, 48, 70, 65]
   const max = Math.max(...data)
+
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-black">
+      <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+    </div>
+  )
 
   return (
     <div className="min-h-screen bg-black pt-24 pb-16">

@@ -1,53 +1,64 @@
-import { createServerSupabase } from "@/lib/supabase/server"
-import { notFound } from "next/navigation"
+"use client"
+
+import { Suspense, useEffect, useState } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
-import { Store, MapPin, Phone, Check, ArrowRight, Shield } from "lucide-react"
-import type { Metadata } from "next"
+import { Store, MapPin, Phone, Shield, ArrowRight, Loader2 } from "lucide-react"
 
-interface Props {
-  params: Promise<{ slug: string }>
-}
+function StoreContent() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const id = searchParams.get("id")
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params
-  const supabase = await createServerSupabase()
-  const { data: may } = await supabase
-    .from("mayoristas")
-    .select("nombre_negocio, descripcion, provincia")
-    .eq("id", slug)
-    .single()
+  const [mayorista, setMayorista] = useState<any>(null)
+  const [productos, setProductos] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-  if (!may) return { title: "Tienda no encontrada - NexaCuba" }
-  return {
-    title: `${may.nombre_negocio} - NexaCuba`,
-    description: may.descripcion || `Tienda en ${may.provincia} · NexaCuba Marketplace`,
-  }
-}
+  useEffect(() => {
+    if (!id) { router.push("/productos"); return }
+    const supabase = createClient()
+    ;(async () => {
+      const { data: may } = await supabase
+        .from("mayoristas")
+        .select("*, perfiles!inner(email)")
+        .eq("id", id)
+        .single()
+      setMayorista(may)
 
-export default async function StorePage({ params }: Props) {
-  const { slug } = await params
-  const supabase = await createServerSupabase()
+      if (may) {
+        const { data: prods } = await supabase
+          .from("productos")
+          .select("*, categorias!left(nombre, slug)")
+          .eq("mayorista_id", id)
+          .eq("activo", true)
+          .order("destacado", { ascending: false })
+          .order("creado_en", { ascending: false })
+        setProductos(prods || [])
+      }
+      setLoading(false)
+    })()
+  }, [id, router])
 
-  const { data: mayorista } = await supabase
-    .from("mayoristas")
-    .select("*, perfiles!inner(email)")
-    .eq("id", slug)
-    .single()
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-black">
+      <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+    </div>
+  )
 
-  if (!mayorista) notFound()
-
-  const { data: productos } = await supabase
-    .from("productos")
-    .select("*, categorias!left(nombre, slug)")
-    .eq("mayorista_id", slug)
-    .eq("activo", true)
-    .order("destacado", { ascending: false })
-    .order("creado_en", { ascending: false })
+  if (!mayorista) return (
+    <div className="min-h-screen flex items-center justify-center bg-black pt-24">
+      <div className="text-center">
+        <Store className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+        <p className="text-gray-400 text-lg">Tienda no encontrada</p>
+        <Link href="/productos" className="text-blue-400 hover:text-blue-300 mt-4 inline-block">Ver productos →</Link>
+      </div>
+    </div>
+  )
 
   return (
     <div className="min-h-screen bg-black pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-5 sm:px-8">
-        {/* Store header */}
         <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-blue-600/5 to-purple-600/5 p-8 mb-10">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
@@ -74,36 +85,26 @@ export default async function StorePage({ params }: Props) {
               </div>
             )}
             {mayorista.whatsapp && (
-              <a
-                href={`https://wa.me/${mayorista.whatsapp.replace(/[^0-9]/g, "")}?text=${encodeURIComponent("Hola, vi tu tienda en NexaCuba")}`}
-                target="_blank"
-                className="flex items-center gap-1.5 text-green-400 hover:text-green-300 transition-colors"
-              >
+              <a href={`https://wa.me/${mayorista.whatsapp.replace(/[^0-9]/g, "")}`} target="_blank"
+                className="flex items-center gap-1.5 text-green-400 hover:text-green-300 transition-colors">
                 <Phone className="w-4 h-4" />
                 {mayorista.whatsapp}
               </a>
             )}
             <div className="flex items-center gap-1.5 text-gray-300">
               <Store className="w-4 h-4 text-purple-500" />
-              {productos?.length || 0} productos
+              {productos.length} productos
             </div>
           </div>
         </div>
 
-        {/* Products grid */}
-        {productos && productos.length > 0 ? (
+        {productos.length > 0 ? (
           <div>
             <h2 className="text-2xl font-bold text-white mb-6">Productos</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {productos.map((p) => (
                 <div key={p.id} className="rounded-2xl overflow-hidden border border-white/10 bg-white/[0.03] hover:border-blue-500/30 hover:-translate-y-1 transition-all group">
-                  {p.imagenes?.[0] ? (
-                    <img src={p.imagenes[0]} alt={p.nombre} className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500" />
-                  ) : (
-                    <div className="w-full h-48 bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center">
-                      <Store className="w-12 h-12 text-gray-600" />
-                    </div>
-                  )}
+                  <div className="w-full h-48 bg-gradient-to-br from-blue-600/20 to-purple-600/20" />
                   <div className="p-5">
                     <div className="flex items-center justify-between mb-2">
                       {p.categorias && <span className="text-xs text-blue-400 font-medium">{p.categorias.nombre}</span>}
@@ -112,14 +113,12 @@ export default async function StorePage({ params }: Props) {
                     <h3 className="text-lg font-bold text-white mb-1">{p.nombre}</h3>
                     {p.descripcion && <p className="text-gray-400 text-sm mb-4 line-clamp-2">{p.descripcion}</p>}
                     <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 bg-[length:300%_300%] animate-liquid bg-clip-text text-transparent">
+                      <span className="text-2xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent">
                         ${p.precio} {p.moneda}
                       </span>
-                      <a
-                        href={`https://wa.me/${mayorista.whatsapp.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hola, vi este producto en NexaCuba: ${p.nombre} ($${p.precio} ${p.moneda}). ¿Está disponible?`)}`}
+                      <a href={`https://wa.me/${mayorista.whatsapp.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hola, vi este producto en NexaCuba: ${p.nombre} ($${p.precio} ${p.moneda})`)}`}
                         target="_blank"
-                        className="inline-flex items-center gap-1.5 bg-gradient-to-r from-green-600 to-green-500 text-white px-4 py-2.5 rounded-full text-sm font-semibold hover:scale-105 transition-transform"
-                      >
+                        className="inline-flex items-center gap-1.5 bg-gradient-to-r from-green-600 to-green-500 text-white px-4 py-2.5 rounded-full text-sm font-semibold hover:scale-105 transition-transform">
                         Contactar <ArrowRight className="w-4 h-4" />
                       </a>
                     </div>
@@ -136,5 +135,13 @@ export default async function StorePage({ params }: Props) {
         )}
       </div>
     </div>
+  )
+}
+
+export default function StorePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-black"><Loader2 className="w-8 h-8 animate-spin text-blue-500" /></div>}>
+      <StoreContent />
+    </Suspense>
   )
 }
