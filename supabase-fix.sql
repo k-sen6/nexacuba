@@ -6,6 +6,9 @@
 -- 1. Agregar minorista_id a productos (si no existe)
 ALTER TABLE productos ADD COLUMN IF NOT EXISTS minorista_id UUID REFERENCES minoristas(id) ON DELETE CASCADE;
 
+-- 1b. Agregar imagen_url a productos (si no existe)
+ALTER TABLE productos ADD COLUMN IF NOT EXISTS imagen_url TEXT;
+
 -- 2. Recrear constraint de pertenencia
 ALTER TABLE productos DROP CONSTRAINT IF EXISTS producto_pertenece_a_vendedor;
 ALTER TABLE productos ADD CONSTRAINT producto_pertenece_a_vendedor CHECK (

@@ -106,8 +106,9 @@ export function Navbar() {
                   Mis Productos
                 </Link>
               )}
-              <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-all" title={dark ? "Modo claro" : "Modo oscuro"}>
-                {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              <button onClick={toggleTheme} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/20 text-xs text-gray-400 hover:text-white hover:border-blue-500/50 transition-all" title={dark ? "Modo claro" : "Modo oscuro"}>
+                {dark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+                {dark ? "Claro" : "Oscuro"}
               </button>
               <button
                 onClick={handleLogout}
