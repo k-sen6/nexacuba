@@ -5,10 +5,10 @@ export function CTASection() {
     <section className="py-24 px-5 border-t border-white/10 bg-black">
       <div className="max-w-4xl mx-auto text-center">
         <h2 className="text-4xl sm:text-5xl font-black mb-6">
-          ¿Eres <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 bg-[length:300%_300%] animate-liquid bg-clip-text text-transparent">Mayorista?</span>
+          ¿Eres <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 bg-[length:300%_300%] animate-liquid bg-clip-text text-transparent">Vendedor?</span>
         </h2>
         <p className="text-gray-400 text-lg mb-10 max-w-2xl mx-auto">
-          Llega a miles de clientes en Cuba. Publica tus productos, recibe consultas directas por WhatsApp y haz crecer tu negocio.
+          Llega a miles de clientes en Cuba. Publica tus productos como mayorista o minorista, recibe consultas directas por WhatsApp y haz crecer tu negocio.
           <span className="text-white font-medium"> Plan gratuito disponible.</span>
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -16,7 +16,13 @@ export function CTASection() {
             href="/auth/register?rol=mayorista"
             className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold text-lg rounded-full hover:shadow-[0_0_40px_rgba(59,130,246,0.6)] hover:scale-105 transition-all"
           >
-            Registrar mi Negocio →
+            Soy Mayorista →
+          </Link>
+          <Link
+            href="/auth/register?rol=minorista"
+            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-semibold text-lg rounded-full hover:shadow-[0_0_40px_rgba(168,85,247,0.6)] hover:scale-105 transition-all"
+          >
+            Soy Minorista →
           </Link>
           <Link
             href="/productos"
@@ -27,7 +33,7 @@ export function CTASection() {
         </div>
       </div>
       <footer className="mt-24 pt-8 border-t border-white/5 text-center text-sm text-gray-500 max-w-7xl mx-auto">
-        © 2026 NexaCuba — Marketplace B2B para mayoristas en Cuba.
+        © 2026 NexaCuba — Marketplace B2B para mayoristas y minoristas en Cuba.
       </footer>
     </section>
   )

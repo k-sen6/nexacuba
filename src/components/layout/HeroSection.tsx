@@ -45,7 +45,7 @@ export function HeroSection() {
             <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight mb-6">
               <span className="block text-white">Conectamos</span>
               <span className="block bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 bg-[length:300%_300%] animate-liquid bg-clip-text text-transparent text-5xl sm:text-6xl lg:text-7xl xl:text-8xl mt-2">
-                Mayoristas
+                Mayoristas & Minoristas
               </span>
               <span className="block text-white text-xl sm:text-2xl lg:text-3xl font-light mt-4">
                 con Clientes en toda Cuba
@@ -53,7 +53,7 @@ export function HeroSection() {
             </h1>
 
             <p className="text-lg sm:text-xl text-gray-300 mb-10 max-w-xl leading-relaxed">
-              La plataforma donde mayoristas cubanos publican sus ofertas y los clientes compran directamente vía WhatsApp.
+              La plataforma donde mayoristas y minoristas cubanos publican sus ofertas y los clientes compran directamente vía WhatsApp.
               <span className="text-white font-medium"> Sin comisiones por venta.</span>
             </p>
 
@@ -65,6 +65,12 @@ export function HeroSection() {
                 Soy Mayorista <ArrowRight className="w-5 h-5" />
               </Link>
               <Link
+                href="/auth/register?rol=minorista"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-semibold text-lg rounded-full hover:shadow-[0_0_40px_rgba(168,85,247,0.6)] hover:scale-105 transition-all"
+              >
+                Soy Minorista <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link
                 href="/auth/register?rol=cliente"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-white/20 text-white font-semibold text-lg rounded-full hover:bg-white/10 hover:border-white/30 transition-all backdrop-blur-sm"
               >
@@ -74,7 +80,7 @@ export function HeroSection() {
 
             <div className="grid grid-cols-3 gap-6 mt-12 pt-8 border-t border-white/5">
               {[
-                { icon: Shield, label: "Proveedores Verificados", desc: "Todos los mayoristas pasan validación" },
+                { icon: Shield, label: "Vendedores Verificados", desc: "Todos pasan validación" },
                 { icon: Zap, label: "Conexión Directa", desc: "WhatsApp directo al vendedor" },
                 { icon: Truck, label: "Envío a Toda Cuba", desc: "Entrega en todas las provincias" },
               ].map((item) => (
