@@ -22,7 +22,7 @@ interface Producto {
   categorias?: { nombre: string } | null
 }
 
-export default function MayoristaProductos() {
+export default function MinoristaProductos() {
   const router = useRouter()
   const [productos, setProductos] = useState<Producto[]>([])
   const [categorias, setCategorias] = useState<{ id: string; nombre: string }[]>([])
@@ -41,7 +41,7 @@ export default function MayoristaProductos() {
       const { data: prods } = await supabase
         .from("productos")
         .select("*, categorias!left(nombre)")
-        .eq("mayorista_id", user.id)
+        .eq("minorista_id", user.id)
         .order("creado_en", { ascending: false })
       setProductos(prods || [])
       setLoading(false)
@@ -59,7 +59,7 @@ export default function MayoristaProductos() {
     const { data } = await supabase
       .from("productos")
       .select("*, categorias!left(nombre)")
-      .eq("mayorista_id", user.id)
+      .eq("minorista_id", user.id)
       .order("creado_en", { ascending: false })
     setProductos(data || [])
   }
@@ -169,7 +169,7 @@ export default function MayoristaProductos() {
           onClose={closeModal}
           product={editProduct || undefined}
           categorias={categorias}
-          tipoVendedor="mayorista"
+          tipoVendedor="minorista"
         />
       </Modal>
 

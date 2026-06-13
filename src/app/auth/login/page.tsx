@@ -43,6 +43,8 @@ function LoginForm() {
 
     if (perfil?.rol === "mayorista") {
       router.push("/mayorista/dashboard")
+    } else if (perfil?.rol === "minorista") {
+      router.push("/minorista/dashboard")
     } else if (perfil?.rol === "admin") {
       router.push("/admin")
     } else {

@@ -3,14 +3,16 @@
 import { createServerSupabase } from "./server"
 import { revalidatePath } from "next/cache"
 
-export async function getProductos(mayoristaId?: string) {
+export async function getProductos(vendedorId?: string, tipoVendedor?: "mayorista" | "minorista") {
   const supabase = await createServerSupabase()
   let query = supabase
     .from("productos")
-    .select("*, mayoristas!inner(nombre_negocio, whatsapp, provincia), categorias!left(nombre, slug)")
+    .select("*, mayoristas!left(nombre_negocio, whatsapp, provincia, verificada), minoristas!left(nombre_negocio, whatsapp, provincia, verificada), categorias!left(nombre, slug)")
 
-  if (mayoristaId) {
-    query = query.eq("mayorista_id", mayoristaId)
+  if (vendedorId && tipoVendedor === "mayorista") {
+    query = query.eq("mayorista_id", vendedorId)
+  } else if (vendedorId && tipoVendedor === "minorista") {
+    query = query.eq("minorista_id", vendedorId)
   }
 
   const { data, error } = await query.order("creado_en", { ascending: false })
@@ -22,7 +24,7 @@ export async function getProducto(id: string) {
   const supabase = await createServerSupabase()
   const { data, error } = await supabase
     .from("productos")
-    .select("*, mayoristas!inner(nombre_negocio, whatsapp, provincia), categorias!left(nombre, slug)")
+    .select("*, mayoristas!left(nombre_negocio, whatsapp, provincia, verificada), minoristas!left(nombre_negocio, whatsapp, provincia, verificada), categorias!left(nombre, slug)")
     .eq("id", id)
     .single()
 
@@ -32,12 +34,11 @@ export async function getProducto(id: string) {
 
 export async function crearProducto(formData: FormData) {
   const supabase = await createServerSupabase()
-
   const { data: user } = await supabase.auth.getUser()
   if (!user.user) throw new Error("No autenticado")
 
-  const producto = {
-    mayorista_id: user.user.id,
+  const tipo = formData.get("tipo") as string
+  const producto: Record<string, any> = {
     nombre: formData.get("nombre") as string,
     descripcion: formData.get("descripcion") as string,
     precio: parseFloat(formData.get("precio") as string),
@@ -48,9 +49,17 @@ export async function crearProducto(formData: FormData) {
     activo: true,
   }
 
+  if (tipo === "minorista") {
+    producto.minorista_id = user.user.id
+  } else {
+    producto.mayorista_id = user.user.id
+  }
+
   const { error } = await supabase.from("productos").insert(producto)
   if (error) throw new Error(error.message)
-  revalidatePath("/mayorista/productos")
+
+  const path = tipo === "minorista" ? "/minorista/productos" : "/mayorista/productos"
+  revalidatePath(path)
 }
 
 export async function editarProducto(id: string, formData: FormData) {
@@ -69,14 +78,18 @@ export async function editarProducto(id: string, formData: FormData) {
 
   const { error } = await supabase.from("productos").update(producto).eq("id", id)
   if (error) throw new Error(error.message)
+
   revalidatePath("/mayorista/productos")
+  revalidatePath("/minorista/productos")
 }
 
 export async function eliminarProducto(id: string) {
   const supabase = await createServerSupabase()
   const { error } = await supabase.from("productos").delete().eq("id", id)
   if (error) throw new Error(error.message)
+
   revalidatePath("/mayorista/productos")
+  revalidatePath("/minorista/productos")
 }
 
 export async function getCategorias() {
@@ -93,26 +106,28 @@ export async function getPerfilActual() {
 
   const { data: perfil } = await supabase
     .from("perfiles")
-    .select("*, mayoristas!left(*)")
+    .select("*, mayoristas!left(*), minoristas!left(*)")
     .eq("id", user.user.id)
     .single()
 
   return perfil
 }
 
-export async function getDashboardStats(mayoristaId: string) {
+export async function getDashboardStats(vendedorId: string, tipo: "mayorista" | "minorista") {
   const supabase = await createServerSupabase()
+
+  const idField = tipo === "mayorista" ? "mayorista_id" : "minorista_id"
 
   const { count: totalProductos } = await supabase
     .from("productos")
     .select("*", { count: "exact", head: true })
-    .eq("mayorista_id", mayoristaId)
+    .eq(idField, vendedorId)
     .eq("activo", true)
 
   const { count: totalClicks } = await supabase
     .from("clics")
     .select("*", { count: "exact", head: true })
-    .eq("producto_id", mayoristaId)
+    .eq("producto_id", vendedorId)
 
   return {
     totalProductos: totalProductos || 0,

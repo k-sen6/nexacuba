@@ -1,4 +1,4 @@
-export type RolUsuario = "cliente" | "mayorista" | "admin"
+export type RolUsuario = "cliente" | "mayorista" | "minorista" | "admin"
 
 export interface PerfilUsuario {
   id: string
@@ -16,6 +16,21 @@ export interface Mayorista extends PerfilUsuario {
   whatsapp: string
   direccion?: string
   provincia: string
+  acepta_transferencia: boolean
+  tipo_envio: "domicilio" | "recogida" | "ambos"
+  verificada: boolean
+  plan: PlanSuscripcion
+  plan_activo_hasta?: string
+}
+
+export interface Minorista extends PerfilUsuario {
+  nombre_negocio: string
+  descripcion?: string
+  whatsapp: string
+  direccion?: string
+  provincia: string
+  acepta_transferencia: boolean
+  tipo_envio: "domicilio" | "recogida" | "ambos"
   verificada: boolean
   plan: PlanSuscripcion
   plan_activo_hasta?: string
@@ -27,6 +42,7 @@ export interface PlanInfo {
   id: PlanSuscripcion
   nombre: string
   precio_mensual: number
+  moneda: string
   productos_max: number
   analytics: boolean
   soporte_preferente: boolean
@@ -43,18 +59,20 @@ export interface Categoria {
 
 export interface Producto {
   id: string
-  mayorista_id: string
+  mayorista_id?: string
+  minorista_id?: string
   nombre: string
   descripcion: string
   precio: number
-  moneda: "USD" | "CUP" | "MLC"
+  moneda: "USD" | "CUP"
   imagenes: string[]
   categoria_id: string
   stock?: number
   destacado: boolean
   activo: boolean
   creado_en: string
-  mayorista?: Pick<Mayorista, "nombre_negocio" | "whatsapp" | "provincia">
+  mayorista?: Pick<Mayorista, "nombre_negocio" | "whatsapp" | "provincia" | "verificada" | "acepta_transferencia" | "tipo_envio">
+  minorista?: Pick<Minorista, "nombre_negocio" | "whatsapp" | "provincia" | "verificada" | "acepta_transferencia" | "tipo_envio">
 }
 
 export interface Oferta {
@@ -76,7 +94,8 @@ export interface ClickLead {
 
 export interface Suscripcion {
   id: string
-  mayorista_id: string
+  vendedor_id: string
+  vendedor_tipo: "mayorista" | "minorista"
   plan: PlanSuscripcion
   monto: number
   fecha_inicio: string

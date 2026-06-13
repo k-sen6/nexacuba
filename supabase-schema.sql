@@ -1,20 +1,20 @@
 -- ============================================
 -- NEXACUBA - Esquema de Base de Datos
--- Marketplace B2B para mayoristas en Cuba
+-- Marketplace B2B para mayoristas y minoristas en Cuba
 -- ============================================
 
 -- Tabla de perfiles de usuario (se crea automáticamente con trigger)
 CREATE TABLE IF NOT EXISTS perfiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT,
-  rol TEXT NOT NULL DEFAULT 'cliente' CHECK (rol IN ('cliente', 'mayorista', 'admin')),
+  rol TEXT NOT NULL DEFAULT 'cliente' CHECK (rol IN ('cliente', 'mayorista', 'minorista', 'admin')),
   nombre TEXT,
   telefono TEXT,
   avatar_url TEXT,
   creado_en TIMESTAMPTZ DEFAULT now()
 );
 
--- Tabla de mayoristas (datos adicionales)
+-- Tabla de mayoristas (venta al por mayor)
 CREATE TABLE IF NOT EXISTS mayoristas (
   id UUID PRIMARY KEY REFERENCES perfiles(id) ON DELETE CASCADE,
   nombre_negocio TEXT NOT NULL,
@@ -22,6 +22,24 @@ CREATE TABLE IF NOT EXISTS mayoristas (
   whatsapp TEXT NOT NULL,
   direccion TEXT,
   provincia TEXT NOT NULL,
+  acepta_transferencia BOOLEAN DEFAULT false,
+  tipo_envio TEXT DEFAULT 'ambos' CHECK (tipo_envio IN ('domicilio', 'recogida', 'ambos')),
+  verificada BOOLEAN DEFAULT false,
+  plan TEXT DEFAULT 'gratis' CHECK (plan IN ('gratis', 'basico', 'pro', 'enterprise')),
+  stripe_customer_id TEXT,
+  plan_activo_hasta TIMESTAMPTZ
+);
+
+-- Tabla de minoristas (venta al detalle)
+CREATE TABLE IF NOT EXISTS minoristas (
+  id UUID PRIMARY KEY REFERENCES perfiles(id) ON DELETE CASCADE,
+  nombre_negocio TEXT NOT NULL,
+  descripcion TEXT,
+  whatsapp TEXT NOT NULL,
+  direccion TEXT,
+  provincia TEXT NOT NULL,
+  acepta_transferencia BOOLEAN DEFAULT false,
+  tipo_envio TEXT DEFAULT 'ambos' CHECK (tipo_envio IN ('domicilio', 'recogida', 'ambos')),
   verificada BOOLEAN DEFAULT false,
   plan TEXT DEFAULT 'gratis' CHECK (plan IN ('gratis', 'basico', 'pro', 'enterprise')),
   stripe_customer_id TEXT,
@@ -37,21 +55,26 @@ CREATE TABLE IF NOT EXISTS categorias (
   creado_en TIMESTAMPTZ DEFAULT now()
 );
 
--- Tabla de productos
+-- Tabla de productos (pueden pertenecer a un mayorista o a un minorista)
 CREATE TABLE IF NOT EXISTS productos (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  mayorista_id UUID NOT NULL REFERENCES mayoristas(id) ON DELETE CASCADE,
+  mayorista_id UUID REFERENCES mayoristas(id) ON DELETE CASCADE,
+  minorista_id UUID REFERENCES minoristas(id) ON DELETE CASCADE,
   nombre TEXT NOT NULL,
   descripcion TEXT,
   precio NUMERIC(10,2) NOT NULL,
-  moneda TEXT DEFAULT 'USD' CHECK (moneda IN ('USD', 'CUP', 'MLC')),
+  moneda TEXT DEFAULT 'CUP' CHECK (moneda IN ('CUP', 'USD')),
   imagenes TEXT[] DEFAULT '{}',
   categoria_id UUID REFERENCES categorias(id),
   stock INTEGER,
   destacado BOOLEAN DEFAULT false,
   activo BOOLEAN DEFAULT true,
   creado_en TIMESTAMPTZ DEFAULT now(),
-  actualizado_en TIMESTAMPTZ DEFAULT now()
+  actualizado_en TIMESTAMPTZ DEFAULT now(),
+  CONSTRAINT producto_pertenece_a_vendedor CHECK (
+    (mayorista_id IS NOT NULL AND minorista_id IS NULL) OR
+    (mayorista_id IS NULL AND minorista_id IS NOT NULL)
+  )
 );
 
 -- Tabla de ofertas especiales
@@ -77,7 +100,8 @@ CREATE TABLE IF NOT EXISTS clics (
 -- Tabla de suscripciones
 CREATE TABLE IF NOT EXISTS suscripciones (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  mayorista_id UUID NOT NULL REFERENCES mayoristas(id) ON DELETE CASCADE,
+  vendedor_id UUID NOT NULL,
+  vendedor_tipo TEXT NOT NULL CHECK (vendedor_tipo IN ('mayorista', 'minorista')),
   plan TEXT NOT NULL CHECK (plan IN ('basico', 'pro', 'enterprise')),
   monto NUMERIC(10,2) NOT NULL,
   fecha_inicio TIMESTAMPTZ NOT NULL,
@@ -90,22 +114,24 @@ CREATE TABLE IF NOT EXISTS suscripciones (
 -- Tabla de visitas diarias (para dashboards)
 CREATE TABLE IF NOT EXISTS visitas_diarias (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  mayorista_id UUID NOT NULL REFERENCES mayoristas(id) ON DELETE CASCADE,
+  vendedor_id UUID NOT NULL,
+  vendedor_tipo TEXT NOT NULL CHECK (vendedor_tipo IN ('mayorista', 'minorista')),
   fecha DATE NOT NULL DEFAULT CURRENT_DATE,
   visitas INTEGER DEFAULT 0,
   clics_whatsapp INTEGER DEFAULT 0,
-  UNIQUE(mayorista_id, fecha)
+  UNIQUE(vendedor_id, vendedor_tipo, fecha)
 );
 
 -- ============================================
 -- ÍNDICES
 -- ============================================
 CREATE INDEX IF NOT EXISTS idx_productos_mayorista ON productos(mayorista_id);
+CREATE INDEX IF NOT EXISTS idx_productos_minorista ON productos(minorista_id);
 CREATE INDEX IF NOT EXISTS idx_productos_categoria ON productos(categoria_id);
 CREATE INDEX IF NOT EXISTS idx_productos_activo ON productos(activo) WHERE activo = true;
 CREATE INDEX IF NOT EXISTS idx_clics_producto ON clics(producto_id);
 CREATE INDEX IF NOT EXISTS idx_clics_created_at ON clics(created_at);
-CREATE INDEX IF NOT EXISTS idx_visitas_mayorista ON visitas_diarias(mayorista_id);
+CREATE INDEX IF NOT EXISTS idx_visitas_vendedor ON visitas_diarias(vendedor_id, vendedor_tipo);
 CREATE INDEX IF NOT EXISTS idx_visitas_fecha ON visitas_diarias(fecha);
 
 -- ============================================
@@ -125,12 +151,27 @@ BEGIN
 
   -- Si es mayorista, crear registro también en tabla mayoristas
   IF COALESCE(NEW.raw_user_meta_data->>'rol', 'cliente') = 'mayorista' THEN
-    INSERT INTO public.mayoristas (id, nombre_negocio, whatsapp, provincia)
+    INSERT INTO public.mayoristas (id, nombre_negocio, whatsapp, provincia, acepta_transferencia, tipo_envio)
     VALUES (
       NEW.id,
       COALESCE(NEW.raw_user_meta_data->>'nombre_negocio', ''),
       COALESCE(NEW.raw_user_meta_data->>'whatsapp', ''),
-      COALESCE(NEW.raw_user_meta_data->>'provincia', '')
+      COALESCE(NEW.raw_user_meta_data->>'provincia', ''),
+      (NEW.raw_user_meta_data->>'acepta_transferencia')::boolean,
+      COALESCE(NEW.raw_user_meta_data->>'tipo_envio', 'ambos')
+    );
+  END IF;
+
+  -- Si es minorista, crear registro en tabla minoristas
+  IF COALESCE(NEW.raw_user_meta_data->>'rol', 'cliente') = 'minorista' THEN
+    INSERT INTO public.minoristas (id, nombre_negocio, whatsapp, provincia, acepta_transferencia, tipo_envio)
+    VALUES (
+      NEW.id,
+      COALESCE(NEW.raw_user_meta_data->>'nombre_negocio', ''),
+      COALESCE(NEW.raw_user_meta_data->>'whatsapp', ''),
+      COALESCE(NEW.raw_user_meta_data->>'provincia', ''),
+      (NEW.raw_user_meta_data->>'acepta_transferencia')::boolean,
+      COALESCE(NEW.raw_user_meta_data->>'tipo_envio', 'ambos')
     );
   END IF;
 
@@ -148,6 +189,7 @@ CREATE TRIGGER on_auth_user_created
 -- ============================================
 ALTER TABLE perfiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE mayoristas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE minoristas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE productos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ofertas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE clics ENABLE ROW LEVEL SECURITY;
@@ -159,25 +201,40 @@ CREATE POLICY perfiles_select_own ON perfiles FOR SELECT USING (auth.uid() = id)
 CREATE POLICY perfiles_update_own ON perfiles FOR UPDATE USING (auth.uid() = id);
 CREATE POLICY perfiles_insert_own ON perfiles FOR INSERT WITH CHECK (auth.uid() = id);
 
--- Mayoristas: select público (para mostrar en productos), update solo propio
+-- Mayoristas: select público, update solo propio
 CREATE POLICY mayoristas_select_public ON mayoristas FOR SELECT USING (true);
 CREATE POLICY mayoristas_update_own ON mayoristas FOR UPDATE USING (auth.uid() = id);
 
+-- Minoristas: select público, update solo propio
+CREATE POLICY minoristas_select_public ON minoristas FOR SELECT USING (true);
+CREATE POLICY minoristas_update_own ON minoristas FOR UPDATE USING (auth.uid() = id);
+
 -- Productos: select público (catálogo visible para todos)
 CREATE POLICY productos_select_public ON productos FOR SELECT USING (true);
-CREATE POLICY productos_insert_own ON productos FOR INSERT WITH CHECK (auth.uid() = mayorista_id);
-CREATE POLICY productos_update_own ON productos FOR UPDATE USING (auth.uid() = mayorista_id);
-CREATE POLICY productos_delete_own ON productos FOR DELETE USING (auth.uid() = mayorista_id);
-
--- Clics: solo insert (público) y select para el mayorista
-CREATE POLICY clics_insert_anon ON clics FOR INSERT WITH CHECK (true);
-CREATE POLICY clics_select_own ON clics FOR SELECT USING (
-  EXISTS (SELECT 1 FROM productos WHERE productos.id = clics.producto_id AND productos.mayorista_id = auth.uid())
+CREATE POLICY productos_insert_own ON productos FOR INSERT WITH CHECK (
+  (mayorista_id IS NOT NULL AND auth.uid() = mayorista_id) OR
+  (minorista_id IS NOT NULL AND auth.uid() = minorista_id)
+);
+CREATE POLICY productos_update_own ON productos FOR UPDATE USING (
+  (mayorista_id IS NOT NULL AND auth.uid() = mayorista_id) OR
+  (minorista_id IS NOT NULL AND auth.uid() = minorista_id)
+);
+CREATE POLICY productos_delete_own ON productos FOR DELETE USING (
+  (mayorista_id IS NOT NULL AND auth.uid() = mayorista_id) OR
+  (minorista_id IS NOT NULL AND auth.uid() = minorista_id)
 );
 
--- Suscripciones: solo el mayorista ve las suyas
-CREATE POLICY suscripciones_select_own ON suscripciones FOR SELECT USING (auth.uid() = mayorista_id);
+-- Clics: solo insert (público) y select para el dueño del producto
+CREATE POLICY clics_insert_anon ON clics FOR INSERT WITH CHECK (true);
+CREATE POLICY clics_select_own ON clics FOR SELECT USING (
+  EXISTS (SELECT 1 FROM productos WHERE productos.id = clics.producto_id AND
+    ((productos.mayorista_id IS NOT NULL AND productos.mayorista_id = auth.uid()) OR
+     (productos.minorista_id IS NOT NULL AND productos.minorista_id = auth.uid())))
+);
 
--- Visitas diarias: solo el mayorista ve las suyas
-CREATE POLICY visitas_select_own ON visitas_diarias FOR SELECT USING (auth.uid() = mayorista_id);
-CREATE POLICY visitas_insert_update ON visitas_diarias FOR INSERT WITH CHECK (auth.uid() = mayorista_id);
+-- Suscripciones: solo el vendedor ve las suyas
+CREATE POLICY suscripciones_select_own ON suscripciones FOR SELECT USING (auth.uid() = vendedor_id);
+
+-- Visitas diarias: solo el vendedor ve las suyas
+CREATE POLICY visitas_select_own ON visitas_diarias FOR SELECT USING (auth.uid() = vendedor_id);
+CREATE POLICY visitas_insert_update ON visitas_diarias FOR INSERT WITH CHECK (auth.uid() = vendedor_id);

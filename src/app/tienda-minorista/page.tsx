@@ -11,7 +11,7 @@ function StoreContent() {
   const router = useRouter()
   const id = searchParams.get("id")
 
-  const [mayorista, setMayorista] = useState<any>(null)
+  const [minorista, setMinorista] = useState<any>(null)
   const [productos, setProductos] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -20,17 +20,17 @@ function StoreContent() {
     const supabase = createClient()
     ;(async () => {
       const { data: may } = await supabase
-        .from("mayoristas")
+        .from("minoristas")
         .select("*, perfiles!inner(email)")
         .eq("id", id)
         .single()
-      setMayorista(may)
+      setMinorista(may)
 
       if (may) {
         const { data: prods } = await supabase
           .from("productos")
           .select("*, categorias!left(nombre, slug)")
-          .eq("mayorista_id", id)
+          .eq("minorista_id", id)
           .eq("activo", true)
           .order("destacado", { ascending: false })
           .order("creado_en", { ascending: false })
@@ -46,11 +46,11 @@ function StoreContent() {
     </div>
   )
 
-  if (!mayorista) return (
+  if (!minorista) return (
     <div className="min-h-screen flex items-center justify-center bg-black pt-24">
       <div className="text-center">
         <Store className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-        <p className="text-gray-400 text-lg">Tienda no encontrada</p>
+        <p className="text-gray-400 text-lg">Tienda minorista no encontrada</p>
         <Link href="/productos" className="text-blue-400 hover:text-blue-300 mt-4 inline-block">Ver productos →</Link>
       </div>
     </div>
@@ -72,29 +72,32 @@ function StoreContent() {
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-3">
-                <h1 className="text-3xl sm:text-4xl font-black text-white">{mayorista.nombre_negocio}</h1>
-                {mayorista.verificada && (
+                <h1 className="text-3xl sm:text-4xl font-black text-white">{minorista.nombre_negocio}</h1>
+                <span className="px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 text-xs font-medium border border-purple-500/20">
+                  Minorista
+                </span>
+                {minorista.verificada && (
                   <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-medium border border-green-500/20">
                     <Shield className="w-3 h-3" /> Verificado
                   </span>
                 )}
               </div>
-              {mayorista.descripcion && <p className="text-gray-400 mt-2">{mayorista.descripcion}</p>}
+              {minorista.descripcion && <p className="text-gray-400 mt-2">{minorista.descripcion}</p>}
             </div>
           </div>
 
           <div className="flex flex-wrap gap-4 text-sm">
-            {mayorista.provincia && (
+            {minorista.provincia && (
               <div className="flex items-center gap-1.5 text-gray-300">
                 <MapPin className="w-4 h-4 text-blue-500" />
-                {mayorista.provincia}
+                {minorista.provincia}
               </div>
             )}
-            {mayorista.whatsapp && (
-              <a href={`https://wa.me/${mayorista.whatsapp.replace(/[^0-9]/g, "")}`} target="_blank"
+            {minorista.whatsapp && (
+              <a href={`https://wa.me/${minorista.whatsapp.replace(/[^0-9]/g, "")}`} target="_blank"
                 className="flex items-center gap-1.5 text-green-400 hover:text-green-300 transition-colors">
                 <Phone className="w-4 h-4" />
-                {mayorista.whatsapp}
+                {minorista.whatsapp}
               </a>
             )}
             <div className="flex items-center gap-1.5 text-gray-300">
@@ -104,14 +107,14 @@ function StoreContent() {
           </div>
 
           <div className="flex flex-wrap gap-3 mt-4">
-            {mayorista.acepta_transferencia && (
+            {minorista.acepta_transferencia && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
                 <Landmark className="w-3.5 h-3.5" /> Acepta transferencia
               </span>
             )}
-            {mayorista.tipo_envio && (
+            {minorista.tipo_envio && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                <Truck className="w-3.5 h-3.5" /> {envioLabels[mayorista.tipo_envio] || mayorista.tipo_envio}
+                <Truck className="w-3.5 h-3.5" /> {envioLabels[minorista.tipo_envio] || minorista.tipo_envio}
               </span>
             )}
           </div>
@@ -135,7 +138,7 @@ function StoreContent() {
                       <span className="text-2xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent">
                         ${p.precio} {p.moneda}
                       </span>
-                      <a href={`https://wa.me/${mayorista.whatsapp.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hola, vi este producto en NexaCuba: ${p.nombre} ($${p.precio} ${p.moneda})`)}`}
+                      <a href={`https://wa.me/${minorista.whatsapp.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hola, vi este producto en NexaCuba: ${p.nombre} ($${p.precio} ${p.moneda})`)}`}
                         target="_blank"
                         className="inline-flex items-center gap-1.5 bg-gradient-to-r from-green-600 to-green-500 text-white px-4 py-2.5 rounded-full text-sm font-semibold hover:scale-105 transition-transform">
                         Contactar <ArrowRight className="w-4 h-4" />
@@ -157,7 +160,7 @@ function StoreContent() {
   )
 }
 
-export default function StorePage() {
+export default function MinoristaStorePage() {
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-black"><Loader2 className="w-8 h-8 animate-spin text-blue-500" /></div>}>
       <StoreContent />

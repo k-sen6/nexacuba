@@ -37,6 +37,18 @@ export function Navbar() {
     router.refresh()
   }
 
+  const dashboardLink = role === "mayorista"
+    ? "/mayorista/dashboard"
+    : role === "minorista"
+    ? "/minorista/dashboard"
+    : null
+
+  const productosLink = role === "mayorista"
+    ? "/mayorista/productos"
+    : role === "minorista"
+    ? "/minorista/productos"
+    : null
+
   return (
     <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-black/80 backdrop-blur-xl border-b border-white/10">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 py-4 flex items-center justify-between">
@@ -60,18 +72,18 @@ export function Navbar() {
 
           {user ? (
             <>
-              {role === "mayorista" && (
+              {dashboardLink && (
                 <Link
-                  href="/mayorista/dashboard"
+                  href={dashboardLink}
                   className="flex items-center gap-1.5 text-sm text-blue-400 hover:text-blue-300 transition-colors"
                 >
                   <LayoutDashboard className="w-4 h-4" />
                   Dashboard
                 </Link>
               )}
-              {role === "mayorista" && (
+              {productosLink && (
                 <Link
-                  href="/mayorista/productos"
+                  href={productosLink}
                   className="flex items-center gap-1.5 text-sm text-gray-300 hover:text-white transition-colors"
                 >
                   <Package className="w-4 h-4" />
@@ -118,8 +130,8 @@ export function Navbar() {
           <hr className="border-white/10" />
           {user ? (
             <>
-              {role === "mayorista" && (
-                <Link onClick={() => setOpen(false)} href="/mayorista/dashboard" className="flex items-center gap-2 px-4 py-3 text-blue-400 hover:text-white hover:bg-white/5 rounded-lg">
+              {dashboardLink && (
+                <Link onClick={() => setOpen(false)} href={dashboardLink} className="flex items-center gap-2 px-4 py-3 text-blue-400 hover:text-white hover:bg-white/5 rounded-lg">
                   <LayoutDashboard className="w-4 h-4" /> Dashboard
                 </Link>
               )}

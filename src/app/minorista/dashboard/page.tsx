@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import { Package, BarChart3, Settings, TrendingUp, ShoppingBag, Eye, MousePointerClick, LogOut, Loader2 } from "lucide-react"
 
-export default function MayoristaDashboard() {
+export default function MinoristaDashboard() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [perfil, setPerfil] = useState<any>(null)
@@ -16,7 +16,6 @@ export default function MayoristaDashboard() {
     visitasHoy: 0,
     clicsWhatsApp: 0,
     totalProductos: 0,
-    topProductos: [] as { nombre: string; visitas: number; clics: number }[],
   })
 
   useEffect(() => {
@@ -28,7 +27,7 @@ export default function MayoristaDashboard() {
 
       const { data: perf } = await supabase
         .from("perfiles")
-        .select("*, mayoristas!left(*)")
+        .select("*, minoristas!left(*)")
         .eq("id", u.id)
         .single()
       setPerfil(perf)
@@ -36,13 +35,13 @@ export default function MayoristaDashboard() {
       const { count: totalActivos } = await supabase
         .from("productos")
         .select("*", { count: "exact", head: true })
-        .eq("mayorista_id", u.id)
+        .eq("minorista_id", u.id)
         .eq("activo", true)
 
       const { count: totalProd } = await supabase
         .from("productos")
         .select("*", { count: "exact", head: true })
-        .eq("mayorista_id", u.id)
+        .eq("minorista_id", u.id)
 
       const hoy = new Date()
       hoy.setHours(0, 0, 0, 0)
@@ -50,7 +49,8 @@ export default function MayoristaDashboard() {
       const { data: visitas } = await supabase
         .from("visitas_diarias")
         .select("visitas")
-        .eq("mayorista_id", u.id)
+        .eq("vendedor_id", u.id)
+        .eq("vendedor_tipo", "minorista")
         .gte("fecha", hoy.toISOString().split("T")[0])
 
       const visitasHoy = visitas?.reduce((acc, v) => acc + (v.visitas || 0), 0) || 0
@@ -60,7 +60,6 @@ export default function MayoristaDashboard() {
         totalProductos: totalProd || 0,
         visitasHoy,
         clicsWhatsApp: 0,
-        topProductos: [],
       })
       setLoading(false)
     })()
@@ -80,9 +79,9 @@ export default function MayoristaDashboard() {
 
   const cards = [
     { icon: Eye, label: "Visitas Hoy", value: stats.visitasHoy.toString() || "0", color: "blue" },
-    { icon: MousePointerClick, label: "WhatsApp Clicks", value: stats.clicsWhatsApp.toString(), change: "Hoy", color: "purple" },
+    { icon: MousePointerClick, label: "WhatsApp Clicks", value: stats.clicsWhatsApp.toString(), color: "purple" },
     { icon: ShoppingBag, label: "Productos", value: stats.productosActivos.toString(), sub: `${stats.totalProductos} total`, color: "cyan" },
-    { icon: TrendingUp, label: "Plan Actual", value: perfil?.mayoristas?.plan || "Gratis", color: "green" },
+    { icon: TrendingUp, label: "Plan Actual", value: perfil?.minoristas?.plan || "Gratis", color: "green" },
   ]
 
   return (
@@ -94,7 +93,7 @@ export default function MayoristaDashboard() {
               Panel de <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 bg-[length:300%_300%] animate-liquid bg-clip-text text-transparent">Control</span>
             </h1>
             <p className="text-gray-400 mt-1">
-              Bienvenido de nuevo, {perfil?.nombre || user?.user_metadata?.nombre || "Mayorista"}
+              Bienvenido de nuevo, {perfil?.nombre || user?.user_metadata?.nombre || "Minorista"}
             </p>
           </div>
           <button onClick={handleLogout} className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:border-red-500/30 transition-all">
@@ -116,17 +115,17 @@ export default function MayoristaDashboard() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-4 mb-10">
-          <Link href="/mayorista/productos" className="p-6 rounded-2xl border border-white/10 bg-gradient-to-br from-blue-600/10 to-transparent hover:border-blue-500/30 transition-all group">
+          <Link href="/minorista/productos" className="p-6 rounded-2xl border border-white/10 bg-gradient-to-br from-blue-600/10 to-transparent hover:border-blue-500/30 transition-all group">
             <Package className="w-8 h-8 text-blue-500 mb-3" />
             <h3 className="font-bold text-white text-lg mb-1">Gestionar Productos</h3>
             <p className="text-sm text-gray-400">Añade, edita o elimina tus productos</p>
           </Link>
-          <Link href="/mayorista/analytics" className="p-6 rounded-2xl border border-white/10 bg-gradient-to-br from-purple-600/10 to-transparent hover:border-purple-500/30 transition-all group">
+          <Link href="/minorista/analytics" className="p-6 rounded-2xl border border-white/10 bg-gradient-to-br from-purple-600/10 to-transparent hover:border-purple-500/30 transition-all group">
             <BarChart3 className="w-8 h-8 text-purple-500 mb-3" />
             <h3 className="font-bold text-white text-lg mb-1">Analytics</h3>
             <p className="text-sm text-gray-400">Métricas detalladas de tu negocio</p>
           </Link>
-          <Link href="/mayorista/configuracion" className="p-6 rounded-2xl border border-white/10 bg-gradient-to-br from-cyan-600/10 to-transparent hover:border-cyan-500/30 transition-all group">
+          <Link href="/minorista/configuracion" className="p-6 rounded-2xl border border-white/10 bg-gradient-to-br from-cyan-600/10 to-transparent hover:border-cyan-500/30 transition-all group">
             <Settings className="w-8 h-8 text-cyan-500 mb-3" />
             <h3 className="font-bold text-white text-lg mb-1">Configuración</h3>
             <p className="text-sm text-gray-400">Plan, facturación y perfil</p>
@@ -136,10 +135,10 @@ export default function MayoristaDashboard() {
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-white">Tus Productos</h2>
-            <Link href="/mayorista/productos" className="text-sm text-blue-400 hover:text-blue-300">Gestionar</Link>
+            <Link href="/minorista/productos" className="text-sm text-blue-400 hover:text-blue-300">Gestionar</Link>
           </div>
           {stats.totalProductos === 0 ? (
-            <p className="text-gray-500 text-center py-8">Aún no has publicado productos. <Link href="/mayorista/productos" className="text-blue-400">Publica tu primero</Link></p>
+            <p className="text-gray-500 text-center py-8">Aún no has publicado productos. <Link href="/minorista/productos" className="text-blue-400">Publica tu primero</Link></p>
           ) : (
             <p className="text-gray-400">
               Tienes <span className="text-white font-medium">{stats.productosActivos}</span> productos activos de{" "}

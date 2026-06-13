@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Loader2 } from "lucide-react"
+import { toast } from "sonner"
 
 interface ProductFormProps {
   onClose: () => void
@@ -20,9 +21,10 @@ interface ProductFormProps {
     imagenes: string[]
   }
   categorias: { id: string; nombre: string }[]
+  tipoVendedor: "mayorista" | "minorista"
 }
 
-export function ProductForm({ onClose, product, categorias }: ProductFormProps) {
+export function ProductForm({ onClose, product, categorias, tipoVendedor }: ProductFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -30,7 +32,7 @@ export function ProductForm({ onClose, product, categorias }: ProductFormProps) 
     nombre: product?.nombre || "",
     descripcion: product?.descripcion || "",
     precio: product?.precio?.toString() || "",
-    moneda: product?.moneda || "USD",
+    moneda: product?.moneda || "CUP",
     categoria_id: product?.categoria_id || "",
     stock: product?.stock?.toString() || "",
     destacado: product?.destacado || false,
@@ -53,8 +55,7 @@ export function ProductForm({ onClose, product, categorias }: ProductFormProps) 
       return
     }
 
-    const data = {
-      mayorista_id: user?.id,
+    const baseData: Record<string, any> = {
       nombre: form.nombre,
       descripcion: form.descripcion || null,
       precio: parseFloat(form.precio),
@@ -65,12 +66,22 @@ export function ProductForm({ onClose, product, categorias }: ProductFormProps) 
       activo: form.activo,
     }
 
+    if (!product) {
+      if (tipoVendedor === "mayorista") {
+        baseData.mayorista_id = user?.id
+      } else {
+        baseData.minorista_id = user?.id
+      }
+    }
+
     if (product) {
-      const { error: err } = await supabase.from("productos").update(data).eq("id", product.id)
+      const { error: err } = await supabase.from("productos").update(baseData).eq("id", product.id)
       if (err) { setError(err.message); setLoading(false); return }
+      toast.success("Producto actualizado correctamente")
     } else {
-      const { error: err } = await supabase.from("productos").insert(data)
+      const { error: err } = await supabase.from("productos").insert(baseData)
       if (err) { setError(err.message); setLoading(false); return }
+      toast.success("Producto creado correctamente")
     }
 
     router.refresh()
@@ -114,10 +125,8 @@ export function ProductForm({ onClose, product, categorias }: ProductFormProps) 
             value={form.moneda} onChange={(e) => update("moneda", e.target.value)}
             className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
           >
-            <option value="USD" className="bg-gray-900">USD</option>
             <option value="CUP" className="bg-gray-900">CUP</option>
-            <option value="MLC" className="bg-gray-900">MLC</option>
-            <option value="USDT" className="bg-gray-900">USDT</option>
+            <option value="USD" className="bg-gray-900">USD</option>
           </select>
         </div>
       </div>

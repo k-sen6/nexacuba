@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { TrendingUp, Eye, MousePointerClick, ShoppingBag, Loader2 } from "lucide-react"
 
-export default function MayoristaAnalytics() {
+export default function MinoristaAnalytics() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState({ visitas: 0, clics: 0, productos: 0 })
@@ -16,13 +16,10 @@ export default function MayoristaAnalytics() {
       const { data: { user: u } } = await supabase.auth.getUser()
       if (!u) { router.push("/auth/login"); return }
 
-      const hoy = new Date()
-      hoy.setHours(0, 0, 0, 0)
-
       const { count: totalProds } = await supabase
         .from("productos")
         .select("*", { count: "exact", head: true })
-        .eq("mayorista_id", u.id)
+        .eq("minorista_id", u.id)
         .eq("activo", true)
 
       const { count: totalClicks } = await supabase
@@ -33,7 +30,8 @@ export default function MayoristaAnalytics() {
       const { data: visitas } = await supabase
         .from("visitas_diarias")
         .select("visitas, clics_whatsapp")
-        .eq("mayorista_id", u.id)
+        .eq("vendedor_id", u.id)
+        .eq("vendedor_tipo", "minorista")
 
       const totalVisitas = visitas?.reduce((acc, v) => acc + (v.visitas || 0), 0) || 0
 

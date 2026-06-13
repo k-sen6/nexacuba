@@ -4,12 +4,12 @@ import { Suspense, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
-import { Store, Mail, Lock, User, Phone, Building2, MapPin, CheckCircle, ArrowRight, ShoppingCart } from "lucide-react"
+import { Store, Mail, Lock, User, Phone, Building2, MapPin, CheckCircle, ArrowRight, ShoppingCart, Landmark, Truck } from "lucide-react"
 
 function RegisterForm() {
   const searchParams = useSearchParams()
   const rolParam = searchParams.get("rol") || "cliente"
-  const [rol, setRol] = useState<"cliente" | "mayorista">(rolParam as "cliente" | "mayorista")
+  const [rol, setRol] = useState<"cliente" | "mayorista" | "minorista">(rolParam as "cliente" | "mayorista" | "minorista")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
@@ -17,6 +17,7 @@ function RegisterForm() {
   const [form, setForm] = useState({
     email: "", password: "", nombre: "", telefono: "",
     nombre_negocio: "", provincia: "", whatsapp: "",
+    acepta_transferencia: false, tipo_envio: "ambos",
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,6 +37,8 @@ function RegisterForm() {
           nombre_negocio: form.nombre_negocio,
           provincia: form.provincia,
           whatsapp: form.whatsapp,
+          acepta_transferencia: form.acepta_transferencia,
+          tipo_envio: form.tipo_envio,
         },
       },
     })
@@ -51,7 +54,7 @@ function RegisterForm() {
     setLoading(false)
   }
 
-  const update = (field: string, value: string) => setForm((f) => ({ ...f, [field]: value }))
+  const update = (field: string, value: string | boolean) => setForm((f) => ({ ...f, [field]: value }))
 
   if (success) {
     return (
@@ -76,6 +79,8 @@ function RegisterForm() {
     )
   }
 
+  const showBusinessFields = rol === "mayorista" || rol === "minorista"
+
   return (
     <div className="min-h-screen flex items-center justify-center px-5 pt-24 pb-12 bg-black">
       <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-950 to-black" />
@@ -91,7 +96,7 @@ function RegisterForm() {
         </div>
 
         <div className="flex gap-2 mb-6 p-1 rounded-xl bg-white/5 border border-white/10">
-          {(["cliente", "mayorista"] as const).map((r) => (
+          {(["cliente", "mayorista", "minorista"] as const).map((r) => (
             <button
               key={r}
               onClick={() => { setRol(r); setError("") }}
@@ -99,7 +104,7 @@ function RegisterForm() {
                 rol === r ? "bg-blue-600 text-white shadow-lg" : "text-gray-400 hover:text-white"
               }`}
             >
-              {r === "cliente" ? <><ShoppingCart className="w-4 h-4" /> Cliente</> : <><Store className="w-4 h-4" /> Mayorista</>}
+              {r === "cliente" ? <><ShoppingCart className="w-4 h-4" /> Cliente</> : r === "mayorista" ? <><Building2 className="w-4 h-4" /> Mayorista</> : <><Store className="w-4 h-4" /> Minorista</>}
             </button>
           ))}
         </div>
@@ -138,7 +143,7 @@ function RegisterForm() {
             />
           </div>
 
-          {rol === "mayorista" && (
+          {showBusinessFields && (
             <>
               <div className="relative">
                 <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
@@ -164,6 +169,28 @@ function RegisterForm() {
                   className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-gray-500 focus:outline-none focus:border-blue-500/50 transition-colors"
                 />
               </div>
+              <div className="flex items-center gap-2 p-3 rounded-xl bg-white/5 border border-white/10">
+                <Landmark className="w-5 h-5 text-gray-500 shrink-0" />
+                <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-300">
+                  <input
+                    type="checkbox" checked={form.acepta_transferencia}
+                    onChange={(e) => update("acepta_transferencia", e.target.checked)}
+                    className="w-4 h-4 rounded border-white/20 bg-white/5 accent-blue-600"
+                  />
+                  Acepto pago por transferencia
+                </label>
+              </div>
+              <div className="relative">
+                <Truck className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <select
+                  value={form.tipo_envio} onChange={(e) => update("tipo_envio", e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50 transition-colors appearance-none"
+                >
+                  <option value="ambos" className="bg-gray-900">Envío a domicilio y recogida</option>
+                  <option value="domicilio" className="bg-gray-900">Solo envío a domicilio</option>
+                  <option value="recogida" className="bg-gray-900">Solo recogida en local</option>
+                </select>
+              </div>
             </>
           )}
 
@@ -173,7 +200,7 @@ function RegisterForm() {
             type="submit" disabled={loading}
             className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold rounded-xl hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] transition-all disabled:opacity-50"
           >
-            {loading ? "Creando cuenta..." : `Crear Cuenta ${rol === "mayorista" ? "como Mayorista" : ""}`}
+            {loading ? "Creando cuenta..." : `Crear Cuenta ${rol === "mayorista" ? "como Mayorista" : rol === "minorista" ? "como Minorista" : ""}`}
           </button>
         </form>
 

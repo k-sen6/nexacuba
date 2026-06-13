@@ -7,8 +7,8 @@ import { Toaster } from "sonner"
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
 export const metadata: Metadata = {
-  title: "NexaCuba | Marketplace Mayorista",
-  description: "La plataforma B2B que conecta mayoristas con clientes en Cuba. Ofertas, catálogos y gestión de ventas.",
+  title: "NexaCuba | Marketplace Mayorista & Minorista",
+  description: "La plataforma B2B que conecta mayoristas y minoristas con clientes en Cuba. Ofertas, catálogos y gestión de ventas.",
   manifest: "/manifest.json",
   appleWebApp: { capable: true, title: "NexaCuba", statusBarStyle: "black-translucent" },
   icons: { apple: "/icon-192.svg" },
