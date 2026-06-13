@@ -16,7 +16,26 @@ ALTER TABLE productos ADD CONSTRAINT producto_pertenece_a_vendedor CHECK (
   (mayorista_id IS NULL AND minorista_id IS NOT NULL)
 );
 
--- 3. RLS para Storage (bucket 'productos' debe crearse manualmente en Supabase Dashboard)
+-- 3. Recrear RLS de productos (para que funcionen con minorista_id)
+DROP POLICY IF EXISTS productos_select_public ON productos;
+CREATE POLICY productos_select_public ON productos FOR SELECT USING (true);
+DROP POLICY IF EXISTS productos_insert_own ON productos;
+CREATE POLICY productos_insert_own ON productos FOR INSERT WITH CHECK (
+  (mayorista_id IS NOT NULL AND auth.uid() = mayorista_id) OR
+  (minorista_id IS NOT NULL AND auth.uid() = minorista_id)
+);
+DROP POLICY IF EXISTS productos_update_own ON productos;
+CREATE POLICY productos_update_own ON productos FOR UPDATE USING (
+  (mayorista_id IS NOT NULL AND auth.uid() = mayorista_id) OR
+  (minorista_id IS NOT NULL AND auth.uid() = minorista_id)
+);
+DROP POLICY IF EXISTS productos_delete_own ON productos;
+CREATE POLICY productos_delete_own ON productos FOR DELETE USING (
+  (mayorista_id IS NOT NULL AND auth.uid() = mayorista_id) OR
+  (minorista_id IS NOT NULL AND auth.uid() = minorista_id)
+);
+
+-- 4. RLS para Storage (bucket 'productos' debe crearse manualmente en Supabase Dashboard)
 DROP POLICY IF EXISTS "Usuarios autenticados pueden subir imagenes" ON storage.objects;
 CREATE POLICY "Usuarios autenticados pueden subir imagenes"
 ON storage.objects FOR INSERT
