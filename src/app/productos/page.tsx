@@ -66,6 +66,8 @@ export default function ProductosPage() {
 
   const getVendedor = (p: ProductoConVendedor) => p.mayoristas || p.minoristas
 
+  const getImagen = (p: ProductoConVendedor) => (p as any).imagen_url
+
   const handleWhatsApp = (p: ProductoConVendedor) => {
     const v = getVendedor(p)
     const msg = encodeURIComponent(`Hola, vi este producto en NexaCuba: ${p.nombre} ($${p.precio} ${p.moneda}). ¿Está disponible?`)
@@ -139,9 +141,13 @@ export default function ProductosPage() {
                 className="group relative rounded-2xl overflow-hidden border border-white/10 bg-white/[0.03] hover:border-blue-500/30 hover:-translate-y-1 transition-all"
               >
                 <div className="relative overflow-hidden">
-                  <div className="w-full h-56 bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center">
-                    <Store className="w-16 h-16 text-white/20" />
-                  </div>
+                  {getImagen(p) ? (
+                    <img src={getImagen(p)} alt={p.nombre} className="w-full h-56 object-cover" />
+                  ) : (
+                    <div className="w-full h-56 bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center">
+                      <Store className="w-16 h-16 text-white/20" />
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <div className="p-5">

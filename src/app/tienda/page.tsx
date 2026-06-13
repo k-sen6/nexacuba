@@ -123,7 +123,11 @@ function StoreContent() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {productos.map((p) => (
                 <div key={p.id} className="rounded-2xl overflow-hidden border border-white/10 bg-white/[0.03] hover:border-blue-500/30 hover:-translate-y-1 transition-all group">
-                  <div className="w-full h-48 bg-gradient-to-br from-blue-600/20 to-purple-600/20" />
+                  {p.imagen_url ? (
+                    <img src={p.imagen_url} alt={p.nombre} className="w-full h-48 object-cover" />
+                  ) : (
+                    <div className="w-full h-48 bg-gradient-to-br from-blue-600/20 to-purple-600/20" />
+                  )}
                   <div className="p-5">
                     <div className="flex items-center justify-between mb-2">
                       {p.categorias && <span className="text-xs text-blue-400 font-medium">{p.categorias.nombre}</span>}
