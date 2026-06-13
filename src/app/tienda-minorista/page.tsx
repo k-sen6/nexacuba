@@ -166,7 +166,7 @@ function StoreContent() {
 
 export default function MinoristaStorePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-black"><Loader2 className="w-8 h-8 animate-spin text-blue-500" /></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-blue-500" /></div>}>
       <StoreContent />
     </Suspense>
   )

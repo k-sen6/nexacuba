@@ -110,8 +110,10 @@ body {
 .light .bg-gradient-to-br .text-white { color: #fff !important; }
 
 /* Backgrounds */
+.light .bg-black { background: var(--bg) !important; }
 .light .bg-black\/80 { background: var(--nav-bg) !important; }
 .light .bg-black\/60 { background: rgba(255,255,255,0.6) !important; }
+.light .bg-gray-950 { background: var(--bg) !important; }
 
 /* Gradient overlays (hero, login, register) */
 .light .from-black { --tw-gradient-from: var(--bg) !important; }

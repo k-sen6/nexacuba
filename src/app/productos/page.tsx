@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
+import { useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Search, MapPin, Filter, ArrowRight, SearchX, Shield, Loader2, Store, Landmark, Truck } from "lucide-react"
 
@@ -25,10 +26,11 @@ interface Categoria {
   slug: string
 }
 
-export default function ProductosPage() {
+function ProductosContent() {
+  const searchParams = useSearchParams()
   const [search, setSearch] = useState("")
   const [selectedProv, setSelectedProv] = useState("")
-  const [selectedCat, setSelectedCat] = useState("")
+  const [selectedCat, setSelectedCat] = useState(searchParams.get("categoria") || "")
   const [productos, setProductos] = useState<ProductoConVendedor[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [loading, setLoading] = useState(true)
@@ -195,5 +197,13 @@ export default function ProductosPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function ProductosPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-blue-500" /></div>}>
+      <ProductosContent />
+    </Suspense>
   )
 }

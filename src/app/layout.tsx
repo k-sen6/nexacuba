@@ -16,7 +16,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className="scroll-smooth">
+    <html lang="es" className="scroll-smooth" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{
+          __html: `(function(){try{var t=localStorage.getItem("nexacuba-theme");if(t==="light")document.documentElement.classList.add("light")}catch(e){}})()`
+        }} />
+      </head>
       <body className={`${inter.variable} antialiased`}>
         <Navbar />
         <main className="min-h-screen">{children}</main>
