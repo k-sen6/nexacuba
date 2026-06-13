@@ -3,9 +3,10 @@
 -- Ejecutar UNA vez en Supabase SQL Editor
 -- ============================================
 
--- 1. Agregar columnas faltantes
+-- 1. Agregar columnas faltantes y quitar NOT NULL de mayorista_id
 ALTER TABLE productos ADD COLUMN IF NOT EXISTS minorista_id UUID REFERENCES minoristas(id) ON DELETE CASCADE;
 ALTER TABLE productos ADD COLUMN IF NOT EXISTS imagen_url TEXT;
+ALTER TABLE productos ALTER COLUMN mayorista_id DROP NOT NULL;
 
 -- 2. Recrear constraint de pertenencia
 ALTER TABLE productos DROP CONSTRAINT IF EXISTS producto_pertenece_a_vendedor;
