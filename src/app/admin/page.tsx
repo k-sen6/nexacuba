@@ -16,7 +16,7 @@ interface VendedorItem {
   plan: string
   plan_activo_hasta: string | null
   tipo: "mayorista" | "minorista"
-  perfiles: { email: string; nombre: string; creado_en: string }
+  perfiles: { email: string; nombre: string; created_at: string }
 }
 
 export default function AdminPage() {
@@ -32,12 +32,12 @@ export default function AdminPage() {
     const [mayoristasRes, minoristasRes] = await Promise.all([
       supabase
         .from("mayoristas")
-        .select("*, perfiles!inner(email, nombre, creado_en)")
-        .order("creado_en", { ascending: false }),
+        .select("*, perfiles!inner(email, nombre, created_at)")
+        .order("created_at", { ascending: false }),
       supabase
         .from("minoristas")
-        .select("*, perfiles!inner(email, nombre, creado_en)")
-        .order("creado_en", { ascending: false }),
+        .select("*, perfiles!inner(email, nombre, created_at)")
+        .order("created_at", { ascending: false }),
     ])
 
     const mays: VendedorItem[] = (mayoristasRes.data || []).map((m: any) => ({

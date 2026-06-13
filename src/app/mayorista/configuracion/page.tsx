@@ -44,7 +44,7 @@ export default function MayoristaConfigPage() {
     { label: "Transferencia", value: mayorista?.acepta_transferencia ? "Sí" : "No" },
     { label: "Tipo de envío", value: envioLabels[mayorista?.tipo_envio] || "—" },
     { label: "Plan", value: mayorista?.plan || "gratis" },
-    { label: "Cuenta creada", value: perfil?.creado_en ? new Date(perfil.creado_en).toLocaleDateString("es-CU") : "—" },
+    { label: "Cuenta creada", value: perfil?.created_at ? new Date(perfil.created_at).toLocaleDateString("es-CU") : "—" },
   ]
 
   const planesCUP = [

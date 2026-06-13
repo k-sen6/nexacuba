@@ -42,7 +42,7 @@ export default function MinoristaProductos() {
         .from("productos")
         .select("*, categorias!left(nombre)")
         .eq("minorista_id", user.id)
-        .order("creado_en", { ascending: false })
+        .order("created_at", { ascending: false })
       setProductos(prods || [])
       setLoading(false)
     })()
@@ -60,7 +60,7 @@ export default function MinoristaProductos() {
       .from("productos")
       .select("*, categorias!left(nombre)")
       .eq("minorista_id", user.id)
-      .order("creado_en", { ascending: false })
+      .order("created_at", { ascending: false })
     setProductos(data || [])
   }
 

@@ -7,7 +7,7 @@ export interface PerfilUsuario {
   nombre: string
   telefono?: string
   avatar_url?: string
-  creado_en: string
+  created_at: string
 }
 
 export interface Mayorista extends PerfilUsuario {
@@ -70,7 +70,7 @@ export interface Producto {
   stock?: number
   destacado: boolean
   activo: boolean
-  creado_en: string
+  created_at: string
   mayorista?: Pick<Mayorista, "nombre_negocio" | "whatsapp" | "provincia" | "verificada" | "acepta_transferencia" | "tipo_envio">
   minorista?: Pick<Minorista, "nombre_negocio" | "whatsapp" | "provincia" | "verificada" | "acepta_transferencia" | "tipo_envio">
 }

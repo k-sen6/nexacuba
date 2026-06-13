@@ -44,7 +44,7 @@ export default function MinoristaConfigPage() {
     { label: "Transferencia", value: minorista?.acepta_transferencia ? "Sí" : "No" },
     { label: "Tipo de envío", value: envioLabels[minorista?.tipo_envio] || "—" },
     { label: "Plan", value: minorista?.plan || "gratis" },
-    { label: "Cuenta creada", value: perfil?.creado_en ? new Date(perfil.creado_en).toLocaleDateString("es-CU") : "—" },
+    { label: "Cuenta creada", value: perfil?.created_at ? new Date(perfil.created_at).toLocaleDateString("es-CU") : "—" },
   ]
 
   const planesCUP = [

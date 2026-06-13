@@ -15,7 +15,7 @@ export async function getProductos(vendedorId?: string, tipoVendedor?: "mayorist
     query = query.eq("minorista_id", vendedorId)
   }
 
-  const { data, error } = await query.order("creado_en", { ascending: false })
+  const { data, error } = await query.order("created_at", { ascending: false })
   if (error) throw new Error(error.message)
   return data
 }

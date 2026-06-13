@@ -41,7 +41,7 @@ export default function ProductosPage() {
         .select("*, categorias!left(nombre, slug), mayoristas!left(nombre_negocio, whatsapp, provincia, verificada, acepta_transferencia, tipo_envio), minoristas!left(nombre_negocio, whatsapp, provincia, verificada, acepta_transferencia, tipo_envio)")
         .eq("activo", true)
         .order("destacado", { ascending: false })
-        .order("creado_en", { ascending: false })
+        .order("created_at", { ascending: false })
       setProductos(prods || [])
 
       const { data: cats } = await supabase.from("categorias").select("*").order("nombre")

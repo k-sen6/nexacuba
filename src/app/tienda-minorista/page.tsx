@@ -33,7 +33,7 @@ function StoreContent() {
           .eq("minorista_id", id)
           .eq("activo", true)
           .order("destacado", { ascending: false })
-          .order("creado_en", { ascending: false })
+          .order("created_at", { ascending: false })
         setProductos(prods || [])
       }
       setLoading(false)
