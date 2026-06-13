@@ -75,7 +75,7 @@ export default function ProductosPage() {
   }
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-black">
+    <div className="min-h-screen flex items-center justify-center">
       <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
     </div>
   )
@@ -87,7 +87,7 @@ export default function ProductosPage() {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-16 bg-black">
+    <div className="min-h-screen pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-5 sm:px-8">
         <div className="mb-10">
           <h1 className="text-4xl sm:text-5xl font-black mb-3">

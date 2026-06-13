@@ -25,7 +25,7 @@ export default function MayoristaConfigPage() {
   }, [router])
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-black">
+    <div className="min-h-screen flex items-center justify-center">
       <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
     </div>
   )
@@ -54,13 +54,13 @@ export default function MayoristaConfigPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-black pt-24 pb-16">
+    <div className="min-h-screen pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-5 sm:px-8">
         <div className="mb-10">
-          <h1 className="text-3xl sm:text-4xl font-black">
+          <h1 className="text-3xl sm:text-4xl font-black text-[var(--text)]">
             <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 bg-[length:300%_300%] animate-liquid bg-clip-text text-transparent">Configuración</span>
           </h1>
-          <p className="text-gray-400 mt-1">Gestiona tu perfil, plan y métodos de pago/envío</p>
+          <p className="text-[var(--text-muted)] mt-1">Gestiona tu perfil, plan y métodos de pago/envío</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">

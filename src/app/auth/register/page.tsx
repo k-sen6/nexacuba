@@ -58,7 +58,7 @@ function RegisterForm() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-5 pt-24 pb-12 bg-black">
+    <div className="min-h-screen flex items-center justify-center px-5 pt-24 pb-12">
         <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-950 to-black" />
         <div className="relative w-full max-w-md text-center">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
@@ -82,7 +82,7 @@ function RegisterForm() {
   const showBusinessFields = rol === "mayorista" || rol === "minorista"
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-5 pt-24 pb-12 bg-black">
+      <div className="min-h-screen flex items-center justify-center px-5 pt-24 pb-12">
       <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-950 to-black" />
       <div className="relative w-full max-w-md">
         <div className="text-center mb-8">
@@ -215,7 +215,7 @@ function RegisterForm() {
 
 export default function RegisterPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-black"><div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full" /></div>}>
+    <Suspense fallback={    <div className="min-h-screen flex items-center justify-center"><div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full" /></div>}>
       <RegisterForm />
     </Suspense>
   )

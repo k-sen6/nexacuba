@@ -54,7 +54,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-5 pt-24 pb-12 bg-black">
+    <div className="min-h-screen flex items-center justify-center px-5 pt-24 pb-12">
       <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-950 to-black" />
       <div className="relative w-full max-w-md">
         <div className="text-center mb-8">
@@ -127,7 +127,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-black"><div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full" /></div>}>
+    <Suspense fallback={    <div className="min-h-screen flex items-center justify-center"><div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full" /></div>}>
       <LoginForm />
     </Suspense>
   )

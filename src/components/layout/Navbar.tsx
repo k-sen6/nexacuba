@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { Menu, X, Store, LogIn, UserPlus, LayoutDashboard, LogOut, Package } from "lucide-react"
+import { Menu, X, Store, LogIn, UserPlus, LayoutDashboard, LogOut, Package, Sun, Moon } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function Navbar() {
@@ -12,6 +12,22 @@ export function Navbar() {
   const [open, setOpen] = useState(false)
   const [user, setUser] = useState<any>(null)
   const [role, setRole] = useState<string | null>(null)
+  const [dark, setDark] = useState(true)
+
+  useEffect(() => {
+    const stored = localStorage.getItem("nexacuba-theme")
+    if (stored === "light") {
+      setDark(false)
+      document.documentElement.classList.add("light")
+    }
+  }, [])
+
+  const toggleTheme = () => {
+    const next = !dark
+    setDark(next)
+    document.documentElement.classList.toggle("light", !next)
+    localStorage.setItem("nexacuba-theme", next ? "dark" : "light")
+  }
 
   useEffect(() => {
     const supabase = createClient()
@@ -90,6 +106,9 @@ export function Navbar() {
                   Mis Productos
                 </Link>
               )}
+              <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-all" title={dark ? "Modo claro" : "Modo oscuro"}>
+                {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </button>
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-1.5 px-4 py-2 border border-white/20 text-gray-300 hover:text-white hover:border-red-500/30 text-sm rounded-full transition-all"
@@ -135,6 +154,9 @@ export function Navbar() {
                   <LayoutDashboard className="w-4 h-4" /> Dashboard
                 </Link>
               )}
+              <button onClick={() => { toggleTheme(); setOpen(false) }} className="flex items-center gap-2 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg">
+                {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />} {dark ? "Modo Claro" : "Modo Oscuro"}
+              </button>
               <button onClick={() => { handleLogout(); setOpen(false) }} className="flex items-center justify-center gap-2 px-4 py-3 border border-white/20 text-gray-300 rounded-full hover:border-red-500/30 transition-all">
                 <LogOut className="w-4 h-4" /> Cerrar Sesión
               </button>

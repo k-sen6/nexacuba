@@ -41,13 +41,13 @@ function StoreContent() {
   }, [id, router])
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-black">
+    <div className="min-h-screen flex items-center justify-center">
       <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
     </div>
   )
 
   if (!mayorista) return (
-    <div className="min-h-screen flex items-center justify-center bg-black pt-24">
+    <div className="min-h-screen flex items-center justify-center pt-24">
       <div className="text-center">
         <Store className="w-16 h-16 text-gray-600 mx-auto mb-4" />
         <p className="text-gray-400 text-lg">Tienda no encontrada</p>
@@ -63,7 +63,7 @@ function StoreContent() {
   }
 
   return (
-    <div className="min-h-screen bg-black pt-24 pb-16">
+    <div className="min-h-screen pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-5 sm:px-8">
         <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-blue-600/5 to-purple-600/5 p-8 mb-10">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">

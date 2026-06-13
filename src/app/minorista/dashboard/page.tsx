@@ -85,7 +85,7 @@ export default function MinoristaDashboard() {
   ]
 
   return (
-    <div className="min-h-screen bg-black pt-24 pb-16">
+    <div className="min-h-screen pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-5 sm:px-8">
         <div className="flex items-center justify-between mb-10">
           <div>

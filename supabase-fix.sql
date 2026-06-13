@@ -14,18 +14,20 @@ ALTER TABLE productos ADD CONSTRAINT producto_pertenece_a_vendedor CHECK (
 );
 
 -- 3. RLS para Storage (bucket 'productos' debe crearse manualmente en Supabase Dashboard)
--- Estas policies se aplican al schema storage.objects
-CREATE POLICY IF NOT EXISTS "Usuarios autenticados pueden subir imagenes"
+DROP POLICY IF EXISTS "Usuarios autenticados pueden subir imagenes" ON storage.objects;
+CREATE POLICY "Usuarios autenticados pueden subir imagenes"
 ON storage.objects FOR INSERT
 TO authenticated
 WITH CHECK (bucket_id = 'productos');
 
-CREATE POLICY IF NOT EXISTS "Cualquiera puede ver imagenes"
+DROP POLICY IF EXISTS "Cualquiera puede ver imagenes" ON storage.objects;
+CREATE POLICY "Cualquiera puede ver imagenes"
 ON storage.objects FOR SELECT
 TO public
 USING (bucket_id = 'productos');
 
-CREATE POLICY IF NOT EXISTS "Usuarios pueden eliminar sus propias imagenes"
+DROP POLICY IF EXISTS "Usuarios pueden eliminar sus propias imagenes" ON storage.objects;
+CREATE POLICY "Usuarios pueden eliminar sus propias imagenes"
 ON storage.objects FOR DELETE
 TO authenticated
 USING (bucket_id = 'productos' AND (storage.foldername(name))[1] = auth.uid()::text);

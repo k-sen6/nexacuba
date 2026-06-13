@@ -77,6 +77,7 @@ export default function MayoristaDashboard() {
       <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
     </div>
   )
+  if (!user) return null
 
   const cards = [
     { icon: Eye, label: "Visitas Hoy", value: stats.visitasHoy.toString() || "0", color: "blue" },
@@ -86,7 +87,7 @@ export default function MayoristaDashboard() {
   ]
 
   return (
-    <div className="min-h-screen bg-black pt-24 pb-16">
+    <div className="min-h-screen pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-5 sm:px-8">
         <div className="flex items-center justify-between mb-10">
           <div>
